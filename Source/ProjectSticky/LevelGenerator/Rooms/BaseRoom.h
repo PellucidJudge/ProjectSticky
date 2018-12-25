@@ -4,15 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Engine/Classes/Components/StaticMeshComponent.h"
+#include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
+#include "Engine/StaticMesh.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/DataTable.h"
 #include "BaseRoom.generated.h"
 
 UENUM(BlueprintType)
 enum class ETileType : uint8
 {
-	TT_Corner	UMETA(DisplayName = "Corner"),
+	TT_Floor	UMETA(DisplayName = "Floor"),
 	TT_Wall		UMETA(DisplayName = "Wall"),
-	TT_Floor	UMETA(DisplayName = "Floor")
+	TT_Corner	UMETA(DisplayName = "Corner")
 };
 
 USTRUCT()
@@ -20,11 +23,11 @@ struct FTileStruct
 {
 	GENERATED_BODY()
 
-		UPROPERTY()
-		ETileType tileType;
+	UPROPERTY()
+	ETileType tileType;
 
 	UPROPERTY()
-		TArray<UStaticMesh*> props;
+	UStaticMeshComponent* mainMesh;
 
 };
 
@@ -43,6 +46,15 @@ protected:
 
 	const float ROOMTILEWIDTH = 300;
 
+	// Predefined components
+	UPROPERTY(EditAnywhere, Category = "Components")
+	USceneComponent* root;
+	UPROPERTY(EditAnywhere, Category = "Components")
+	USceneComponent* folderBaseMeshes;
+	UPROPERTY(EditAnywhere, Category = "Components")
+	UStaticMeshComponent* testComponent;
+
+	// Size settings
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomSettings")
 	int32 roomSizeX = 3;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomSettings")
@@ -52,12 +64,30 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomStyle")
 	bool useMapStyle = false;
 	// Arrays Containing the style (intended to be switched out with datatables later)
+	UPROPERTY(EditAnywhere, Category = "RoomStyle")
+	UDataTable* roomStyleDataTable;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomStyle")
 	TArray<UStaticMesh*> roomMeshes_Corners;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomStyle")
 	TArray<UStaticMesh*> roomMeshes_Walls;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomStyle")
 	TArray<UStaticMesh*> roomMeshes_Floors;
+
+	UPROPERTY()
+	TArray<FTileStruct> tileGrid;
+
+
+	UFUNCTION()
+	UStaticMesh* GetRandomMeshInArray(TArray<UStaticMesh*> meshArray);
+
+	UFUNCTION()
+	UStaticMeshComponent* GetTileMesh(int32 XIndex, int32 YIndex);
+	UFUNCTION()
+	ETileType GetTileType(int32 XIndex, int32 YIndex);
+	UFUNCTION()
+	void SetRoomTileMesh(int32 XIndex, int32 YIndex, UStaticMesh* mesh);
+	UFUNCTION()
+	void SetRoomTileType(int32 XIndex, int32 YIndex, ETileType tileType);
 
 public:	
 	// Called every frame
