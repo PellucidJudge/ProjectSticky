@@ -3,5 +3,8 @@
 #include "ProjectStickyGameModeBase.h"
 
 
-
+void AProjectStickyGameModeBase::BeginPlay()
+{
+	
+}
 

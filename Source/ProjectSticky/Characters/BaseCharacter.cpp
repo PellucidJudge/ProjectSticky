@@ -32,3 +32,57 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void ABaseCharacter::CharDeath()
+{
+	this->Destroy();
+}
+
+void ABaseCharacter::MoveCharacter(FVector moveDir)
+{
+	UWorld* world = GetWorld();
+	if (world)
+	{
+		moveDir.GetSafeNormal(1);
+		GetCharacterMovement()->MoveSmooth(GetCharacterMovement()->MaxWalkSpeed * moveDir, world->GetDeltaSeconds());
+	}
+}
+
+void ABaseCharacter::UpdateLookingDirection(float rotation)
+{
+	FRotator lookDirection = FRotator(0,0,0);
+	lookDirection.Roll = this->GetActorRotation().Roll;
+	lookDirection.Pitch = this->GetActorRotation().Pitch;
+	lookDirection.Yaw = rotation;
+
+	this->SetActorRotation(lookDirection);
+}
+
+void ABaseCharacter::StartAttackCharge()
+{
+}
+
+void ABaseCharacter::Attack(FVector attackDir)
+{
+}
+
+
+// Get and set functions
+float ABaseCharacter::GetHealthCurrent()
+{
+	return healthCurrent;
+}
+
+void ABaseCharacter::SetHealthCurrent(float value)
+{
+	healthCurrent = value;
+}
+
+float ABaseCharacter::GetHealthMax()
+{
+	return healthMax;
+}
+
+void ABaseCharacter::SetHealthMax(float value)
+{
+	healthMax = value;
+}

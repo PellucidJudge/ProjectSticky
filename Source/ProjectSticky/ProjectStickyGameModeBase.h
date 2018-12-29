@@ -14,7 +14,9 @@ class PROJECTSTICKY_API AProjectStickyGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
-	
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 	
 	
 };
