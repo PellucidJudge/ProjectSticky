@@ -12,6 +12,17 @@
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class EAttackSlots : uint8
+{
+	AS_BasicAttack		UMETA(DisplayName = "BasicAttack"),
+	AS_SecondaryAttack	UMETA(DisplayName = "SecondaryAttack"),
+	AS_Slot1			UMETA(DisplayName = "AttackSlot1"),
+	AS_Slot2			UMETA(DisplayName = "AttackSlot2"),
+	AS_Slot3			UMETA(DisplayName = "AttackSlot3")
+};
+
 UCLASS()
 class PROJECTSTICKY_API ABasePlayerController : public APlayerController
 {
@@ -36,7 +47,7 @@ protected:
 	UPROPERTY()
 	ABaseCharacter* controlledChar;
 	UPROPERTY()
-	FVector movementOnUpdate;
+	FVector movementOnUpdate = FVector(0,0,0);
 
 	UPROPERTY(EditAnywhere)
 	float cameraHeightOffset = 800;
@@ -50,9 +61,30 @@ protected:
 	float groundOffset = 0;
 
 	UFUNCTION()
-	void MoveForward(float value);
+	void MoveForwardCommand(float value);
 	UFUNCTION()
-	void MoveRight(float value);
+	void MoveRightCommand(float value);
+
+	// Attack functions
+	UFUNCTION()
+	void StartAttackCharge(EAttackSlots attackSlotUsed);
+	UFUNCTION()
+	void CancelAttackCharge(EAttackSlots attackSlotUsed);
+	UFUNCTION()
+	void AttackCommand(EAttackSlots attackSlotUsed);
+
+	void AttackCommandCharge_BasicAttack();
+	void AttackCommandCharge_SecondaryAttack();
+	void AttackCommandCharge_Slot1();
+	void AttackCommandCharge_Slot2();
+	void AttackCommandCharge_Slot3();
+
+	void AttackCommandExe_BasicAttack();
+	void AttackCommandExe_SecondaryAttack();
+	void AttackCommandExe_Slot1();
+	void AttackCommandExe_Slot2();
+	void AttackCommandExe_Slot3();
+
 	UFUNCTION()
 	void UpdateCharRef();
 

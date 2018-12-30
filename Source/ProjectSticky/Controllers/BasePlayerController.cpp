@@ -42,12 +42,12 @@ void ABasePlayerController::Tick(float DeltaSeconds)
 		// Send movement input to possessed character
 		controlledChar->MoveCharacter(movementOnUpdate);
 
-		// Character rotation
+		// Line trace to use with the different functions in this frame
 		FHitResult Hit(ForceInit);
 		FCollisionQueryParams Params = FCollisionQueryParams(FName(TEXT("Trace")), true, controlledChar);
-
 		MouseLineTrace(&Hit, &Params);
 
+		// Character rotation
 		FVector lookDir = controlledChar->GetActorLocation() - Hit.Location;
 		lookDir.GetSafeNormal(1);
 		FRotator lookRot = lookDir.Rotation();
@@ -66,8 +66,10 @@ void ABasePlayerController::Tick(float DeltaSeconds)
 void ABasePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-	InputComponent->BindAxis("MoveForward", this, &ABasePlayerController::MoveForward);
-	InputComponent->BindAxis("MoveRight", this, &ABasePlayerController::MoveRight);
+	InputComponent->BindAxis("MoveForward", this, &ABasePlayerController::MoveForwardCommand);
+	InputComponent->BindAxis("MoveRight", this, &ABasePlayerController::MoveRightCommand);
+	InputComponent->BindAction("BasicAttack", IE_Pressed, this, &ABasePlayerController::AttackCommandCharge_BasicAttack);
+	InputComponent->BindAction("BasicAttack", IE_Released, this, &ABasePlayerController::AttackCommandExe_BasicAttack);
 }
 
 void ABasePlayerController::CalcCamera(float DeltaTime, FMinimalViewInfo & OutResult)
@@ -80,15 +82,65 @@ void ABasePlayerController::CalcCamera(float DeltaTime, FMinimalViewInfo & OutRe
 	GetActorEyesViewPoint(OutResult.Location, OutResult.Rotation);
 }
 
-void ABasePlayerController::MoveForward(float value)
+//_____________________________________________
+// Move Commands
+void ABasePlayerController::MoveForwardCommand(float value)
 {
 	movementOnUpdate.Y = value;
 }
-
-void ABasePlayerController::MoveRight(float value)
+void ABasePlayerController::MoveRightCommand(float value)
 {
 	movementOnUpdate.X = value;
 }
+
+//______________________________________________
+// Attack commands
+void ABasePlayerController::StartAttackCharge(EAttackSlots attackSlotUsed)
+{
+	if (controlledChar)
+	{
+		controlledChar->StartAttackCharge();
+	}
+}
+void ABasePlayerController::CancelAttackCharge(EAttackSlots attackSlotUsed)
+{
+	if (controlledChar)
+	{
+
+	}
+}
+void ABasePlayerController::AttackCommand(EAttackSlots attackSlotUsed)
+{
+	if (controlledChar)
+	{
+		FHitResult Hit(ForceInit);
+		FCollisionQueryParams Params = FCollisionQueryParams(FName(TEXT("Trace")), true, controlledChar);
+		MouseLineTrace(&Hit, &Params);
+
+		FVector attackDir = Hit.Location - controlledChar->GetActorLocation();
+		
+		if (attackDir.GetSafeNormal(1) != FVector(0, 0, 0))
+		{
+			attackDir.Normalize(1);
+			controlledChar->Attack(attackDir);
+		}
+	}
+}
+
+// These attack command functions are unique per input and then provide the identifier to a generic function
+// These start attack charging for the respective slot.
+void ABasePlayerController::AttackCommandCharge_BasicAttack() { StartAttackCharge(EAttackSlots::AS_BasicAttack); }
+void ABasePlayerController::AttackCommandCharge_SecondaryAttack() { StartAttackCharge(EAttackSlots::AS_SecondaryAttack); }
+void ABasePlayerController::AttackCommandCharge_Slot1() { StartAttackCharge(EAttackSlots::AS_Slot1); }
+void ABasePlayerController::AttackCommandCharge_Slot2() { StartAttackCharge(EAttackSlots::AS_Slot2); }
+void ABasePlayerController::AttackCommandCharge_Slot3() { StartAttackCharge(EAttackSlots::AS_Slot3); }
+
+// When the player releases the attack button or other criterias are met the attack goes through.
+void ABasePlayerController::AttackCommandExe_BasicAttack() { AttackCommand(EAttackSlots::AS_BasicAttack); }
+void ABasePlayerController::AttackCommandExe_SecondaryAttack() { AttackCommand(EAttackSlots::AS_SecondaryAttack); }
+void ABasePlayerController::AttackCommandExe_Slot1() { AttackCommand(EAttackSlots::AS_Slot1); }
+void ABasePlayerController::AttackCommandExe_Slot2() { AttackCommand(EAttackSlots::AS_Slot2); }
+void ABasePlayerController::AttackCommandExe_Slot3() { AttackCommand(EAttackSlots::AS_Slot3); }
 
 void ABasePlayerController::UpdateCharRef()
 {
@@ -119,6 +171,5 @@ bool ABasePlayerController::MouseLineTrace(FHitResult* Hit, FCollisionQueryParam
 			return DidTrace;
 		}
 	}
-
 	return false;
 }
