@@ -4,24 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "DrawDebugHelpers.h"
 #include "Engine/World.h"
 #include "ProjectSticky/Characters/BaseCharacter.h"
+#include "ProjectSticky/Characters/Slimes/BaseSlimeChar.h"
+#include "ProjectSticky/Characters/Enemies/BaseEmenyChar.h"
 #include "Runtime/Engine/Classes/Camera/CameraComponent.h"
 #include "BasePlayerController.generated.h"
 
 /**
  * 
  */
-
-UENUM(BlueprintType)
-enum class EAttackSlots : uint8
-{
-	AS_BasicAttack		UMETA(DisplayName = "BasicAttack"),
-	AS_SecondaryAttack	UMETA(DisplayName = "SecondaryAttack"),
-	AS_Slot1			UMETA(DisplayName = "AttackSlot1"),
-	AS_Slot2			UMETA(DisplayName = "AttackSlot2"),
-	AS_Slot3			UMETA(DisplayName = "AttackSlot3")
-};
 
 UCLASS()
 class PROJECTSTICKY_API ABasePlayerController : public APlayerController
@@ -48,7 +41,12 @@ protected:
 	ABaseCharacter* controlledChar;
 	UPROPERTY()
 	FVector movementOnUpdate = FVector(0,0,0);
+	UPROPERTY()
+	ABaseSlimeChar* slimeCharacter;
+	UPROPERTY()
+	bool IsControllingEnemy = false;
 
+	// Camera settings
 	UPROPERTY(EditAnywhere)
 	float cameraHeightOffset = 800;
 	UPROPERTY(EditAnywhere)
@@ -60,12 +58,14 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float groundOffset = 0;
 
+	// Movements functions
 	UFUNCTION()
 	void MoveForwardCommand(float value);
 	UFUNCTION()
 	void MoveRightCommand(float value);
 
 	// Attack functions
+	// Generic attack functions that acts like commands for the controlled pawn
 	UFUNCTION()
 	void StartAttackCharge(EAttackSlots attackSlotUsed);
 	UFUNCTION()
@@ -73,12 +73,14 @@ protected:
 	UFUNCTION()
 	void AttackCommand(EAttackSlots attackSlotUsed);
 
+	// Used for inputs. These indicate when the button is pressed
 	void AttackCommandCharge_BasicAttack();
 	void AttackCommandCharge_SecondaryAttack();
 	void AttackCommandCharge_Slot1();
 	void AttackCommandCharge_Slot2();
 	void AttackCommandCharge_Slot3();
 
+	//Used for inputs. These indicate when the button is released
 	void AttackCommandExe_BasicAttack();
 	void AttackCommandExe_SecondaryAttack();
 	void AttackCommandExe_Slot1();
@@ -86,7 +88,17 @@ protected:
 	void AttackCommandExe_Slot3();
 
 	UFUNCTION()
+	ABaseEmenyChar* TryPossessEnemy();
+	UFUNCTION()
+	bool TakePossessionOfEnemyChar(ABaseEmenyChar* enemyToPossess);
+	UFUNCTION()
+	void ReturnToSlimeForm();
+
+	UFUNCTION()
 	void UpdateCharRef();
+	UFUNCTION()
+	bool TraceSphere(AActor* actorToIngore, const FVector& startPoint, const FVector& endPoint, 
+		const float radius, FHitResult& HitOut, ECollisionChannel TraceChannel = ECC_Pawn);
 
 	bool MouseLineTrace(FHitResult* Hit, FCollisionQueryParams* Params);
 	

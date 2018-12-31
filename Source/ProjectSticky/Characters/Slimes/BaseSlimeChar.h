@@ -13,8 +13,14 @@ UCLASS()
 class PROJECTSTICKY_API ABaseSlimeChar : public ABaseCharacter
 {
 	GENERATED_BODY()
+
+protected:
+
+	virtual void BeginPlay() override;
+
+public:
 	
-	
-	
-	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Possession")
+	void SetSlimeActive(bool value);
+
 };

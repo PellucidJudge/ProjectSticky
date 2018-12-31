@@ -6,8 +6,20 @@
 #include "GameFramework/Character.h"
 #include "Engine/World.h"
 #include "Runtime/Engine/Classes/GameFramework/CharacterMovementComponent.h"
+#include "Runtime/Engine/Classes/Components/SkeletalMeshComponent.h"
+#include "Runtime/Engine/Classes/Components/CapsuleComponent.h"
 #include "ProjectSticky/Interfaces/HealthManipulation.h"
 #include "BaseCharacter.generated.h"
+
+UENUM(BlueprintType)
+enum class EAttackSlots : uint8
+{
+	AS_BasicAttack		UMETA(DisplayName = "BasicAttack"),
+	AS_SecondaryAttack	UMETA(DisplayName = "SecondaryAttack"),
+	AS_Slot1			UMETA(DisplayName = "AttackSlot1"),
+	AS_Slot2			UMETA(DisplayName = "AttackSlot2"),
+	AS_Slot3			UMETA(DisplayName = "AttackSlot3")
+};
 
 UCLASS()
 class PROJECTSTICKY_API ABaseCharacter : public ACharacter, public IHealthManipulation
@@ -38,6 +50,11 @@ protected:
 	float MovementSpeed = 600;
 	UPROPERTY(EditAnywhere, Category = "CharacterStats")
 	float chargingMovePenalty = 0.5;
+	UPROPERTY(EditAnywhere, Category = "CharacterStats")
+	float knockBackResistance = 0;
+
+	//UPROPERTY(EditAnywhere, Category = "Abilities")
+	//BasicAbility
 
 public:	
 
@@ -46,7 +63,7 @@ public:
 	
 	// Health manipulation interface functions
 	UFUNCTION(BLueprintCallable, BlueprintNativeEvent, Category = "Damage")
-	void DamageObject(float damage, AActor* attacker);
+	void DamageObject(float damage, AActor* attacker, float knockBackDistance, FVector knockBackDir);
 	
 	// Called when the health of the character goes below 0
 	UFUNCTION()
@@ -58,11 +75,11 @@ public:
 
 	// Attack functions
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
-	void StartAttackCharge();
+	void StartAttackCharge(EAttackSlots attackSlotUsed);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
 	void InterruptAttackCharge();
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
-	void Attack(FVector attackDir);
+	void Attack(FVector attackDir, EAttackSlots attackSlotUsed);
 
 	// Get and set functions
 	UFUNCTION(BlueprintCallable, Category = "GetSet")

@@ -32,8 +32,14 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseCharacter::DamageObject_Implementation(float damage, AActor * attacker)
+void ABaseCharacter::DamageObject_Implementation(float damage, AActor * attacker, float knockBackDistance, FVector knockBackDir)
 {
+	SetHealthCurrent(GetHealthCurrent() - damage);
+
+	if (GetHealthCurrent() <= 0)
+	{
+		CharDeath();
+	}
 }
 
 // Called when health reaches 0
@@ -65,21 +71,38 @@ void ABaseCharacter::UpdateLookingDirection_Implementation(float rotation)
 	this->SetActorRotation(lookDirection);
 }
 
-void ABaseCharacter::StartAttackCharge_Implementation()
+void ABaseCharacter::StartAttackCharge_Implementation(EAttackSlots attackSlotUsed)
 {
 	SetIsChargingAttack(true);
 }
 void ABaseCharacter::InterruptAttackCharge_Implementation()
 {
 }
-void ABaseCharacter::Attack_Implementation(FVector attackDir)
+void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attackSlotUsed)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("offset %s"), *attackDir.ToString());
-	if (GetIsChargingAttack())
+	switch (attackSlotUsed)
 	{
-		FVector locationOffset = attackDir * 200;
-		this->SetActorLocation(this->GetActorLocation() + locationOffset);
+	case EAttackSlots::AS_BasicAttack:
+
+		if (GetIsChargingAttack())
+		{
+			
+		}
+		break;
+
+	case EAttackSlots::AS_SecondaryAttack:
+		break;
+
+	case EAttackSlots::AS_Slot1:
+		break;
+
+	case EAttackSlots::AS_Slot2:
+		break;
+
+	case EAttackSlots::AS_Slot3:
+		break;
 	}
+
 	SetIsChargingAttack(false);
 }
 

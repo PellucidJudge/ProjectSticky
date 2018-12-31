@@ -14,7 +14,10 @@ class PROJECTSTICKY_API ABaseEmenyChar : public ABaseCharacter
 {
 	GENERATED_BODY()
 	
-	
+protected:
+
+	UPROPERTY()
+	bool IsControlleBySlime = false;
 	
 	
 };
