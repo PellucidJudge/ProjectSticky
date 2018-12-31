@@ -16,7 +16,12 @@ class PROJECTSTICKY_API AMeleeAbility : public ABaseAbility
 	
 public:
 
-	void ChargeAbility(ABaseCharacter* user, FVector direction, float range);
-	void ExecuteAbility(ABaseCharacter* user, FVector direction, float range);
-	
+	virtual void ChargeAbility(AActor* user, FVector direction, float range) override;
+	virtual void ExecuteAbility(AActor* user, FVector direction, float range) override;
+
+
+protected:
+
+	//UFUNCTION()
+	//bool DamageActor(AActor * actor);
 };

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "DrawDebugHelpers.h"
 #include "Engine/World.h"
 #include "ProjectSticky/Characters/BaseCharacter.h"
 #include "ProjectSticky/Characters/Slimes/BaseSlimeChar.h"

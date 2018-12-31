@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Engine/World.h"
-#include "ProjectSticky/Characters/BaseCharacter.h"
+#include "DrawDebugHelpers.h"
 #include "BaseAbility.generated.h"
 
 /**
@@ -32,8 +32,8 @@ public:
 
 	ABaseAbility();
 
-	void ChargeAbility(ABaseCharacter* user, FVector direction);
-	void ExecuteAbility(ABaseCharacter* user, FVector direction);
+	virtual void ChargeAbility(AActor* user, FVector direction, float range);
+	virtual void ExecuteAbility(AActor* user, FVector direction, float range);
 	
 protected:
 
@@ -45,5 +45,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "AbilityDamage")
 	float overallDamageMod = 1;
+
+	UFUNCTION()
+	bool DamageActor(AActor* actor);
 
 };

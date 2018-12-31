@@ -4,6 +4,7 @@
 
 void ABaseSlimeChar::BeginPlay()
 {
+	Super::BeginPlay();
 }
 
 void ABaseSlimeChar::SetSlimeActive_Implementation(bool value)

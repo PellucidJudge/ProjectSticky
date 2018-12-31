@@ -9,6 +9,7 @@
 #include "Runtime/Engine/Classes/Components/SkeletalMeshComponent.h"
 #include "Runtime/Engine/Classes/Components/CapsuleComponent.h"
 #include "ProjectSticky/Interfaces/HealthManipulation.h"
+#include "Abilities/BaseAbility.h"
 #include "BaseCharacter.generated.h"
 
 UENUM(BlueprintType)
@@ -53,8 +54,27 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "CharacterStats")
 	float knockBackResistance = 0;
 
-	//UPROPERTY(EditAnywhere, Category = "Abilities")
-	//BasicAbility
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+	TSubclassOf<class ABaseAbility> BasicAbilityClass;
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TSubclassOf<class ABaseAbility> SecondaryAbilityClass;
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TSubclassOf<class ABaseAbility> Slot1AbilityClass;
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TSubclassOf<class ABaseAbility> Slot2AbilityClass;
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TSubclassOf<class ABaseAbility> Slot3AbilityClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	ABaseAbility* basicAbility;
+	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	ABaseAbility* secondaryAbility;
+	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	ABaseAbility* slot1Ability;
+	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	ABaseAbility* slot2Ability;
+	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	ABaseAbility* slot3Ability;
 
 public:	
 

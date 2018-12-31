@@ -13,12 +13,17 @@ void ABaseAbility::BeginPlay()
 {
 }
 
-void ABaseAbility::ChargeAbility(ABaseCharacter * user, FVector direction)
+bool ABaseAbility::DamageActor(AActor * actor)
+{
+	return false;
+}
+
+void ABaseAbility::ChargeAbility(AActor * user, FVector direction, float range)
 {
 
 }
 
-void ABaseAbility::ExecuteAbility(ABaseCharacter * user, FVector direction)
+void ABaseAbility::ExecuteAbility(AActor * user, FVector direction, float range)
 {
 
 }
