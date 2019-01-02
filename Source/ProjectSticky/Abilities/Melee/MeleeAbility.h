@@ -16,8 +16,11 @@ class PROJECTSTICKY_API AMeleeAbility : public ABaseAbility
 	
 public:
 
-	virtual void ChargeAbility(AActor* user, FVector direction, float range) override;
-	virtual void ExecuteAbility(AActor* user, FVector direction, float range) override;
+	virtual void ChargeAbility_Implementation(AActor* user, FVector direction, float range) override;
+	virtual void ServerChargeAbility_Implementation(AActor* user, FVector direction, float range) override;
+
+	virtual void ExecuteAbility_Implementation(AActor* user, FVector direction, float range) override;
+	virtual void ServerExecuteAbility_Implementation(AActor* user, FVector direction, float range) override;
 
 
 protected:

@@ -28,6 +28,9 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	UPROPERTY(replicated)
+	float useless;
+
 	//Components
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* root;
@@ -38,7 +41,7 @@ protected:
 
 	UPROPERTY()
 	ABaseCharacter* controlledChar;
-	UPROPERTY()
+	UPROPERTY(/*replicated*/)
 	FVector movementOnUpdate = FVector(0,0,0);
 	UPROPERTY()
 	ABaseSlimeChar* slimeCharacter;
@@ -58,9 +61,9 @@ protected:
 	float groundOffset = 0;
 
 	// Movements functions
-	UFUNCTION()
+	UFUNCTION(/*Server, Reliable, WithValidation,*/ Category = "Movement")
 	void MoveForwardCommand(float value);
-	UFUNCTION()
+	UFUNCTION(/*Server, Reliable, WithValidation,*/ Category = "Movement")
 	void MoveRightCommand(float value);
 
 	// Attack functions
@@ -73,17 +76,27 @@ protected:
 	void AttackCommand(EAttackSlots attackSlotUsed);
 
 	// Used for inputs. These indicate when the button is pressed
+	UFUNCTION()
 	void AttackCommandCharge_BasicAttack();
+	UFUNCTION()
 	void AttackCommandCharge_SecondaryAttack();
+	UFUNCTION()
 	void AttackCommandCharge_Slot1();
+	UFUNCTION()
 	void AttackCommandCharge_Slot2();
+	UFUNCTION()
 	void AttackCommandCharge_Slot3();
 
 	//Used for inputs. These indicate when the button is released
+	UFUNCTION()
 	void AttackCommandExe_BasicAttack();
+	UFUNCTION()
 	void AttackCommandExe_SecondaryAttack();
+	UFUNCTION()
 	void AttackCommandExe_Slot1();
+	UFUNCTION()
 	void AttackCommandExe_Slot2();
+	UFUNCTION()
 	void AttackCommandExe_Slot3();
 
 	UFUNCTION()

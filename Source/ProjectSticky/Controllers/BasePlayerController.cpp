@@ -2,9 +2,12 @@
 
 #include "BasePlayerController.h"
 #include "DrawDebugHelpers.h"
+#include "UnrealNetwork.h"
 
 ABasePlayerController::ABasePlayerController()
 {
+	bReplicates = true;
+
 	PrimaryActorTick.bCanEverTick = true;
 	bAutoManageActiveCameraTarget = false;
 
@@ -27,6 +30,14 @@ ABasePlayerController::ABasePlayerController()
 	cameraHolder->SetWorldRotation(FRotator(cameraAngle, 0, 0));
 }
 
+void ABasePlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(ABasePlayerController, useless);
+	//DOREPLIFETIME(ABasePlayerController, movementOnUpdate);
+}
+
 void ABasePlayerController::BeginPlay()
 {
 	UpdateCharRef();
@@ -38,6 +49,7 @@ void ABasePlayerController::BeginPlay()
 
 void ABasePlayerController::Tick(float DeltaSeconds)
 {
+
 	if (controlledChar)
 	{
 		// Send movement input to possessed character
@@ -48,6 +60,7 @@ void ABasePlayerController::Tick(float DeltaSeconds)
 		FCollisionQueryParams Params = FCollisionQueryParams(FName(TEXT("Trace")), true, controlledChar);
 		MouseLineTrace(&Hit, &Params);
 
+		
 		// Character rotation
 		FVector lookDir = controlledChar->GetActorLocation() - Hit.Location;
 		lookDir.GetSafeNormal(1);
@@ -88,15 +101,24 @@ void ABasePlayerController::CalcCamera(float DeltaTime, FMinimalViewInfo & OutRe
 
 //_____________________________________________
 // Move Commands
-void ABasePlayerController::MoveForwardCommand(float value)
+void ABasePlayerController::MoveForwardCommand/*_Implementation*/(float value)
 {
 	movementOnUpdate.Y = value;
 }
-void ABasePlayerController::MoveRightCommand(float value)
+/*bool ABasePlayerController::MoveForwardCommand_Validate(float value)
+{
+	return true;
+}
+*/
+void ABasePlayerController::MoveRightCommand/*_Implementation*/(float value)
 {
 	movementOnUpdate.X = value;
 }
-
+/*bool ABasePlayerController::MoveRightCommand_Validate(float value)
+{
+	return true;
+}
+*/
 //______________________________________________
 // Attack commands
 void ABasePlayerController::StartAttackCharge(EAttackSlots attackSlotUsed)

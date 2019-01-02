@@ -44,11 +44,13 @@ protected:
 	float healthCurrent;
 	UPROPERTY(EditAnywhere, Category = "CharacterStats")
 	float CharDamage;
-	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	UPROPERTY(replicated, VisibleAnywhere, Category = "Combat")
 	bool IsChargingAnAttack = false;
 
-	UPROPERTY(EditAnywhere, Category = "CharacterStats")
-	float MovementSpeed = 600;
+	UPROPERTY(replicated, EditAnywhere, Category = "CharacterStats")
+	float movementSpeed = 600;
+	UPROPERTY(replicated, EditAnywhere, Category = "CharacterStats")
+	float movementSpeedMod = 1;
 	UPROPERTY(EditAnywhere, Category = "CharacterStats")
 	float chargingMovePenalty = 0.5;
 	UPROPERTY(EditAnywhere, Category = "CharacterStats")
@@ -65,7 +67,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TSubclassOf<class ABaseAbility> Slot3AbilityClass;
 
-	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	UPROPERTY(replicated, VisibleAnywhere, Category = "Abilities")
 	ABaseAbility* basicAbility;
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
 	ABaseAbility* secondaryAbility;
@@ -88,9 +90,9 @@ public:
 	// Called when the health of the character goes below 0
 	UFUNCTION()
 	void CharDeath();
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	UFUNCTION(/*Server, Reliable, WithValidation,*/ Category = "Combat")
 	void MoveCharacter(FVector moveDir);
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
+	UFUNCTION(/*Server, Reliable, WithValidation,*/ Category = "Combat")
 	void UpdateLookingDirection(float rotation);
 
 	// Attack functions
@@ -104,7 +106,7 @@ public:
 	// Get and set functions
 	UFUNCTION(BlueprintCallable, Category = "GetSet")
 	bool GetIsChargingAttack();
-	UFUNCTION(BlueprintCallable, Category = "GetSet")
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "GetSet")
 	void SetIsChargingAttack(bool value);
 
 	UFUNCTION(BlueprintCallable, Category = "GetSet")

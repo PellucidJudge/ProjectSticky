@@ -32,8 +32,15 @@ public:
 
 	ABaseAbility();
 
+	UFUNCTION(Server, Reliable, WithValidation, Category = "Ability")
 	virtual void ChargeAbility(AActor* user, FVector direction, float range);
+	UFUNCTION(NetMulticast, Reliable, Category = "Ability")
+	virtual void ServerChargeAbility(AActor* user, FVector direction, float range);
+
+	UFUNCTION(Server, Reliable, WithValidation, Category = "Ability")
 	virtual void ExecuteAbility(AActor* user, FVector direction, float range);
+	UFUNCTION(NetMulticast, Reliable, Category = "Ability")
+	virtual void ServerExecuteAbility(AActor* user, FVector direction, float range);
 	
 protected:
 
