@@ -1,21 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "MeleeAbility.h"
+#include "PointAndClickAbility.h"
 #include "ProjectSticky/Interfaces/HealthManipulation.h"
 #include "Engine.h"
 
-
-AMeleeAbility::AMeleeAbility() : Super()
+APointAndClickAbility::APointAndClickAbility() : Super()
 {
 
 }
 
-void AMeleeAbility::ChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
+void APointAndClickAbility::ChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 	ServerChargeAbility(user, direction, mouseLocation);
 }
 
-void AMeleeAbility::ServerChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
+void APointAndClickAbility::ServerChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 	direction = FVector(direction.X, direction.Y, 0);
 
@@ -25,7 +24,7 @@ void AMeleeAbility::ServerChargeAbility_Implementation(AActor * user, FVector di
 		if (PS_AbilityCharge != nullptr)
 		{
 			FTransform spawnTransform;
-			spawnTransform.SetLocation(user->GetActorLocation());
+			spawnTransform.SetLocation(mouseLocation);
 			spawnTransform.SetRotation(direction.ToOrientationQuat());
 			spawnTransform.SetScale3D(FVector(1, 1, 1));
 			UGameplayStatics::SpawnEmitterAtLocation(world, PS_AbilityCharge, spawnTransform, true);
@@ -34,38 +33,14 @@ void AMeleeAbility::ServerChargeAbility_Implementation(AActor * user, FVector di
 }
 
 // Called on clients to tell the server
-void AMeleeAbility::ExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
+void APointAndClickAbility::ExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
-	if (GEngine)
-	{
-		if (Role == ROLE_Authority)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("SERVER"));
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("CLIENT"));
-		}
-	}
-
-    ServerExecuteAbility(user, direction, mouseLocation);
+	ServerExecuteAbility(user, direction, mouseLocation);
 }
 // Called on server to forward information and actually execute the ability 
-void AMeleeAbility::ServerExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
+void APointAndClickAbility::ServerExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 	direction = FVector(direction.X, direction.Y, 0);
-
-	if (GEngine)
-	{
-		if (Role == ROLE_Authority)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("SERVER"));
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Black, TEXT("CLIENT"));
-		}
-	}
 
 	if (user != nullptr)
 	{
@@ -79,7 +54,7 @@ void AMeleeAbility::ServerExecuteAbility_Implementation(AActor * user, FVector d
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, TEXT("PS_AbilityExecutionPE"));
 				FTransform spawnTransform;
-				spawnTransform.SetLocation(user->GetActorLocation());
+				spawnTransform.SetLocation(mouseLocation);
 				spawnTransform.SetRotation(direction.ToOrientationQuat());
 				spawnTransform.SetScale3D(FVector(1, 1, 1));
 
@@ -91,13 +66,12 @@ void AMeleeAbility::ServerExecuteAbility_Implementation(AActor * user, FVector d
 			FCollisionObjectQueryParams ObjectParams;
 			ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
 			FCollisionQueryParams Params = FCollisionQueryParams(FName(TEXT("BoxTrace")), true, user);
-			FCollisionShape colBox = FCollisionShape::MakeBox(FVector(50, 50, 50));
+			FCollisionShape Sphere = FCollisionShape::MakeSphere(200);
 
-			DrawDebugBox(world, startPoint, FVector(50, 50, 50), FColor::Purple, false, 2.0f);
-			DrawDebugBox(world, startPoint + (direction * baseRange), FVector(50, 50, 50), FColor::Purple, false, 2.0f);
+			//DrawDebugSphere(world, mouseLocation, 200, 16, FColor::Green, false, 2.0f);
 
 			bool anyHit = world->SweepMultiByObjectType(outHits, startPoint, startPoint + (direction * baseRange),
-				direction.Rotation().Quaternion(), ObjectParams, colBox, Params);
+				direction.Rotation().Quaternion(), ObjectParams, Sphere, Params);
 
 			if (anyHit)
 			{
@@ -120,3 +94,4 @@ void AMeleeAbility::ServerExecuteAbility_Implementation(AActor * user, FVector d
 		}
 	}
 }
+

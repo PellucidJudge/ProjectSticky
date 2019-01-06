@@ -35,6 +35,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Character settings
+	UPROPERTY(EditAnywhere, Category = "Settings|Movement")
+	bool rotateToFaceMoveDirection = false;
+
 	// Character stats
 	UPROPERTY(EditAnywhere, Category = "CharacterStats")
 	float healthMax = 3;
@@ -90,18 +94,18 @@ public:
 	// Called when the health of the character goes below 0
 	UFUNCTION()
 	void CharDeath();
-	UFUNCTION(/*Server, Reliable, WithValidation,*/ Category = "Combat")
+	UFUNCTION()
 	void MoveCharacter(FVector moveDir);
-	UFUNCTION(/*Server, Reliable, WithValidation,*/ Category = "Combat")
+	UFUNCTION()
 	void UpdateLookingDirection(float rotation);
 
 	// Attack functions
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
-	void StartAttackCharge(EAttackSlots attackSlotUsed);
+	void StartAttackCharge(FVector attackDir, EAttackSlots attackSlotUsed, FVector mouseLocation);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
 	void InterruptAttackCharge();
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
-	void Attack(FVector attackDir, EAttackSlots attackSlotUsed);
+	void Attack(FVector attackDir, EAttackSlots attackSlotUsed, FVector mouseLocation);
 
 	// Get and set functions
 	UFUNCTION(BlueprintCallable, Category = "GetSet")

@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/BaseAbility.h"
-#include "MeleeAbility.generated.h"
+#include "PointAndClickAbility.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTSTICKY_API AMeleeAbility : public ABaseAbility
+class PROJECTSTICKY_API APointAndClickAbility : public ABaseAbility
 {
 	GENERATED_BODY()
 	
 public:
 
-	AMeleeAbility();
+	APointAndClickAbility();
 
 	virtual void ChargeAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 	virtual void ServerChargeAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
@@ -24,6 +24,5 @@ public:
 	virtual void ExecuteAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 	virtual void ServerExecuteAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 	
-	//UFUNCTION()
-	//bool DamageActor(AActor * actor);
+	
 };

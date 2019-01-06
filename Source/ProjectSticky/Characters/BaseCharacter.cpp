@@ -22,7 +22,6 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutL
 	DOREPLIFETIME(ABaseCharacter, movementSpeed);
 	DOREPLIFETIME(ABaseCharacter, movementSpeedMod);
 	DOREPLIFETIME(ABaseCharacter, IsChargingAnAttack);
-	//DOREPLIFETIME(ABaseCharacter, BasicAbilityClass);
 	DOREPLIFETIME(ABaseCharacter, basicAbility);
 }
 
@@ -125,13 +124,16 @@ bool ABaseCharacter::MoveCharacter_Validate(FVector moveDir)
 */
 void ABaseCharacter::UpdateLookingDirection(float rotation)
 {
-	
-	FRotator lookDirection = FRotator(0,0,0);
-	lookDirection.Roll = this->GetActorRotation().Roll;
-	lookDirection.Pitch = this->GetActorRotation().Pitch;
-	lookDirection.Yaw = rotation;
+	if (rotateToFaceMoveDirection == false)
+	{
+		FRotator lookDirection = FRotator(0, 0, 0);
+		lookDirection.Roll = this->GetActorRotation().Roll;
+		lookDirection.Pitch = this->GetActorRotation().Pitch;
+		lookDirection.Yaw = rotation;
 
-	this->SetActorRotation(lookDirection);
+		this->SetActorRotation(lookDirection);
+	}
+	
 }
 /*
 bool ABaseCharacter::UpdateLookingDirection_Validate(float rotation)
@@ -139,7 +141,7 @@ bool ABaseCharacter::UpdateLookingDirection_Validate(float rotation)
 	return true;
 }
 */
-void ABaseCharacter::StartAttackCharge_Implementation(EAttackSlots attackSlotUsed)
+void ABaseCharacter::StartAttackCharge_Implementation(FVector attackDir, EAttackSlots attackSlotUsed, FVector mouseLocation)
 {
 	switch (attackSlotUsed)
 	{
@@ -147,6 +149,7 @@ void ABaseCharacter::StartAttackCharge_Implementation(EAttackSlots attackSlotUse
 		if (basicAbility != nullptr)
 		{
 			SetIsChargingAttack(true);
+			basicAbility->ChargeAbility(this, attackDir, mouseLocation);
 		}
 		break;
 
@@ -154,6 +157,7 @@ void ABaseCharacter::StartAttackCharge_Implementation(EAttackSlots attackSlotUse
 		if (secondaryAbility != nullptr)
 		{
 			SetIsChargingAttack(true);
+			secondaryAbility->ChargeAbility(this, attackDir, mouseLocation);
 		}
 		break;
 
@@ -161,6 +165,7 @@ void ABaseCharacter::StartAttackCharge_Implementation(EAttackSlots attackSlotUse
 		if (slot1Ability != nullptr)
 		{
 			SetIsChargingAttack(true);
+			slot1Ability->ChargeAbility(this, attackDir, mouseLocation);
 		}
 		break;
 
@@ -168,6 +173,7 @@ void ABaseCharacter::StartAttackCharge_Implementation(EAttackSlots attackSlotUse
 		if (slot2Ability != nullptr)
 		{
 			SetIsChargingAttack(true);
+			slot2Ability->ChargeAbility(this, attackDir, mouseLocation);
 		}
 		break;
 
@@ -175,6 +181,7 @@ void ABaseCharacter::StartAttackCharge_Implementation(EAttackSlots attackSlotUse
 		if (slot3Ability != nullptr)
 		{
 			SetIsChargingAttack(true);
+			slot3Ability->ChargeAbility(this, attackDir, mouseLocation);
 		}
 		break;
 	}
@@ -182,7 +189,7 @@ void ABaseCharacter::StartAttackCharge_Implementation(EAttackSlots attackSlotUse
 void ABaseCharacter::InterruptAttackCharge_Implementation()
 {
 }
-void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attackSlotUsed)
+void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attackSlotUsed, FVector mouseLocation)
 {
 	
 
@@ -193,7 +200,7 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 		{
 			if (basicAbility != nullptr)
 			{
-				basicAbility->ExecuteAbility(this, attackDir, 200);
+				basicAbility->ExecuteAbility(this, attackDir, mouseLocation);
 			}
 		}
 		break;
@@ -203,7 +210,7 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 		{
 			if (secondaryAbility != nullptr)
 			{
-				secondaryAbility->ExecuteAbility(this, attackDir, 200);
+				secondaryAbility->ExecuteAbility(this, attackDir, mouseLocation);
 			}
 		}
 		break;
@@ -213,7 +220,7 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 		{
 			if (slot1Ability != nullptr)
 			{
-				slot1Ability->ExecuteAbility(this, attackDir, 200);
+				slot1Ability->ExecuteAbility(this, attackDir, mouseLocation);
 			}
 		}
 		break;
@@ -223,7 +230,7 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 		{
 			if (slot2Ability != nullptr)
 			{
-				slot2Ability->ExecuteAbility(this, attackDir, 200);
+				slot2Ability->ExecuteAbility(this, attackDir, mouseLocation);
 			}
 		}
 		break;
@@ -233,7 +240,7 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 		{
 			if (slot3Ability != nullptr)
 			{
-				slot3Ability->ExecuteAbility(this, attackDir, 200);
+				slot3Ability->ExecuteAbility(this, attackDir, mouseLocation);
 			}
 		}
 		break;

@@ -4,7 +4,7 @@
 #include "Engine.h"
 
 
-ABaseAbility::ABaseAbility()
+ABaseAbility::ABaseAbility() : Super()
 {
 	bReplicates = true;
 	bAlwaysRelevant = true;
@@ -22,31 +22,35 @@ bool ABaseAbility::DamageActor(AActor * actor)
 {
 	return false;
 }
-
-void ABaseAbility::ChargeAbility_Implementation(AActor * user, FVector direction, float range)
+// Called on clients to tell the server
+// This is called from the controlling character when an ability is charged
+void ABaseAbility::ChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 
 }
-bool ABaseAbility::ChargeAbility_Validate(AActor * user, FVector direction, float range)
+// Validate that the call is correct
+bool ABaseAbility::ChargeAbility_Validate(AActor * user, FVector direction, FVector mouseLocation)
 {
 	return true;
 }
-
-void ABaseAbility::ServerChargeAbility_Implementation(AActor * user, FVector direction, float range)
+// Called on server to forward information and actually execute the ability
+void ABaseAbility::ServerChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 
 }
-
-void ABaseAbility::ExecuteAbility_Implementation(AActor * user, FVector direction, float range)
+// Called on clients to tell the server
+// Called from the controlling character when the attack is supposed to be executed
+void ABaseAbility::ExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 	
 }
-bool ABaseAbility::ExecuteAbility_Validate(AActor * user, FVector direction, float range)
+// Validate that the call is correct
+bool ABaseAbility::ExecuteAbility_Validate(AActor * user, FVector direction, FVector mouseLocation)
 {
 	return true;
 }
-
-void ABaseAbility::ServerExecuteAbility_Implementation(AActor * user, FVector direction, float range)
+// Called on server to forward information and actually execute the ability
+void ABaseAbility::ServerExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 
 }

@@ -101,31 +101,29 @@ void ABasePlayerController::CalcCamera(float DeltaTime, FMinimalViewInfo & OutRe
 
 //_____________________________________________
 // Move Commands
-void ABasePlayerController::MoveForwardCommand/*_Implementation*/(float value)
+void ABasePlayerController::MoveForwardCommand(float value)
 {
 	movementOnUpdate.Y = value;
 }
-/*bool ABasePlayerController::MoveForwardCommand_Validate(float value)
-{
-	return true;
-}
-*/
-void ABasePlayerController::MoveRightCommand/*_Implementation*/(float value)
+
+void ABasePlayerController::MoveRightCommand(float value)
 {
 	movementOnUpdate.X = value;
 }
-/*bool ABasePlayerController::MoveRightCommand_Validate(float value)
-{
-	return true;
-}
-*/
+
 //______________________________________________
 // Attack commands
 void ABasePlayerController::StartAttackCharge(EAttackSlots attackSlotUsed)
 {
 	if (controlledChar)
 	{
-		controlledChar->StartAttackCharge(attackSlotUsed);
+		FHitResult Hit(ForceInit);
+		FCollisionQueryParams Params = FCollisionQueryParams(FName(TEXT("Trace")), true, controlledChar);
+		MouseLineTrace(&Hit, &Params);
+
+		FVector attackDir = Hit.Location - controlledChar->GetActorLocation();
+
+		controlledChar->StartAttackCharge(attackDir, attackSlotUsed, Hit.Location);
 	}
 }
 void ABasePlayerController::CancelAttackCharge(EAttackSlots attackSlotUsed)
@@ -148,7 +146,7 @@ void ABasePlayerController::AttackCommand(EAttackSlots attackSlotUsed)
 		if (attackDir.GetSafeNormal(1) != FVector(0, 0, 0))
 		{
 			attackDir.Normalize(1);
-			controlledChar->Attack(attackDir, attackSlotUsed);
+			controlledChar->Attack(attackDir, attackSlotUsed, Hit.Location);
 		}
 	}
 }

@@ -32,28 +32,50 @@ public:
 
 	ABaseAbility();
 
+	// Time taken for the ability to fully charge
+	UPROPERTY(EditAnywhere, Category = "Ability Stats")
+	float fullChargeTime = 0.5;
+
+	UPROPERTY(EditAnywhere, Category = "Ability Stats")
+	float baseRange = 100;
+
+	// Server side functions for 
 	UFUNCTION(Server, Reliable, WithValidation, Category = "Ability")
-	virtual void ChargeAbility(AActor* user, FVector direction, float range);
+	virtual void ChargeAbility(AActor* user, FVector direction, FVector mouseLocation);
 	UFUNCTION(NetMulticast, Reliable, Category = "Ability")
-	virtual void ServerChargeAbility(AActor* user, FVector direction, float range);
+	virtual void ServerChargeAbility(AActor* user, FVector direction, FVector mouseLocation);
 
 	UFUNCTION(Server, Reliable, WithValidation, Category = "Ability")
-	virtual void ExecuteAbility(AActor* user, FVector direction, float range);
+	virtual void ExecuteAbility(AActor* user, FVector direction, FVector mouseLocation);
 	UFUNCTION(NetMulticast, Reliable, Category = "Ability")
-	virtual void ServerExecuteAbility(AActor* user, FVector direction, float range);
+	virtual void ServerExecuteAbility(AActor* user, FVector direction, FVector mouseLocation);
 	
 protected:
 
 	virtual void BeginPlay() override;
 
-
-	UPROPERTY(EditAnywhere, Category = "AbilityDamage")
+	// Base damage for the ability
+	UPROPERTY(EditAnywhere, Category = "Ability Stats")
 	TArray<FDamage> AbilityBaseDamage;
 
-	UPROPERTY(EditAnywhere, Category = "AbilityDamage")
+	// Generic damage modifier
+	UPROPERTY(EditAnywhere, Category = "Ability Stats")
 	float overallDamageMod = 1;
 
+	// These are the base VFX systems most effects will make use of.
+	// What these systems are depends on ability, will be set in BP child classess
+	UPROPERTY(EditAnywhere, Category = "AbilityVFX")
+	UParticleSystem* PS_AbilityCharge;
+	UPROPERTY(EditAnywhere, Category = "AbilityVFX")
+	UParticleSystem* PS_AbilityExecutionPE;
+	UPROPERTY(EditAnywhere, Category = "AbilityVFX")
+	UParticleSystem* PS_AbilityHitPE;
+
+	// Called when actually hitting another actor
 	UFUNCTION()
 	bool DamageActor(AActor* actor);
 
+	// Basic hit detection functions
+	//UFUNCTION()
+	//	bool MultiBoxTrace(FHitResult* Hit, )
 };

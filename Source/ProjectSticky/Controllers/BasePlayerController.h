@@ -50,9 +50,9 @@ protected:
 
 	// Camera settings
 	UPROPERTY(EditAnywhere)
-	float cameraHeightOffset = 800;
+	float cameraHeightOffset = 1200;
 	UPROPERTY(EditAnywhere)
-	float cameraHorizontalOffset = -400;
+	float cameraHorizontalOffset = -500;
 	UPROPERTY(EditAnywhere)
 	float cameraAngle = -60;
 	UPROPERTY(EditAnywhere)
