@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "UObject/ObjectMacros.h"
+#include "UObject/ScriptMacros.h"
+#include "UObject/Interface.h"
+#include "ProjectSticky/Utility/Structs/HealthManipulationStructs.h"
 #include "HealthManipulation.generated.h"
 
 // This class does not need to be modified.
@@ -24,7 +28,7 @@ class PROJECTSTICKY_API IHealthManipulation
 public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
-	void DamageObject(float damage, AActor* attacker, float knockBackDistance, FVector knockBackDir);
+	void DamageObject(FDamageStruct& damage, AActor* attacker, float knockBackDistance, FVector knockBackDir);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
 	void KillObject();

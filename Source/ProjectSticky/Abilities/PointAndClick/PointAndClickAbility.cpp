@@ -84,7 +84,7 @@ void APointAndClickAbility::ServerExecuteAbility_Implementation(AActor * user, F
 
 						if (HMInterface != nullptr && hitActor != nullptr)
 						{
-							HMInterface->Execute_DamageObject(hitActor, 5, user, 100, direction);
+							//HMInterface->Execute_DamageObject(hitActor, damage, user, 100, direction);
 
 							//UE_LOG(LogTemp, Warning, TEXT("HitActorName: %s") *Hit.Actor->GetName());
 						}

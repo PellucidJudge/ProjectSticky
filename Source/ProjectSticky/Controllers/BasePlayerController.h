@@ -35,36 +35,51 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* root;
 	UPROPERTY(VisibleAnywhere)
+	USceneComponent* cameraBase;
+	UPROPERTY(VisibleAnywhere)
 	USceneComponent* cameraHolder;
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* playerCamera;
 
 	UPROPERTY()
 	ABaseCharacter* controlledChar;
-	UPROPERTY(/*replicated*/)
-	FVector movementOnUpdate = FVector(0,0,0);
+	UPROPERTY()
+	FVector movementOnUpdateForward = FVector(0,0,0);
+	UPROPERTY()
+	FVector movementOnUpdateSideways = FVector(0,0,0);
 	UPROPERTY()
 	ABaseSlimeChar* slimeCharacter;
 	UPROPERTY()
 	bool IsControllingEnemy = false;
 
 	// Camera settings
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Camera|Location")
 	float cameraHeightOffset = 1200;
-	UPROPERTY(EditAnywhere)
-	float cameraHorizontalOffset = -500;
-	UPROPERTY(EditAnywhere)
-	float cameraAngle = -60;
-	UPROPERTY(EditAnywhere)
-	float cameraRotation = 0;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Camera|Location")
+	float cameraHorizontalOffset = -600;
+	UPROPERTY(EditAnywhere, Category = "Camera|Location")
 	float groundOffset = 0;
+	UPROPERTY(EditAnywhere, Category = "Camera|Rotation")
+	float cameraAngle = -60;
+	UPROPERTY(EditAnywhere, Category = "Camera|Rotation")
+	float cameraRotation = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Camera|Zoom")
+	float cameraZoomSpeed = 100;
+	UPROPERTY(EditAnywhere, Category = "Camera|Zoom")
+	float cameraZoomMax = 0.8;
+	UPROPERTY()
+	float cameraCurrentZoomLength = 0;
 
 	// Movements functions
-	UFUNCTION(/*Server, Reliable, WithValidation,*/ Category = "Movement")
-	void MoveForwardCommand(float value);
-	UFUNCTION(/*Server, Reliable, WithValidation,*/ Category = "Movement")
-	void MoveRightCommand(float value);
+	UFUNCTION()
+	void MoveForwardCommand(float value = 0);
+	UFUNCTION()
+	void MoveRightCommand(float value = 0);
+
+	// Camera control functions
+	UFUNCTION()
+	void CameraZoom(float value = 0);
 
 	// Attack functions
 	// Generic attack functions that acts like commands for the controlled pawn

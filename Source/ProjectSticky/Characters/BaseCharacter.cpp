@@ -22,7 +22,6 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutL
 	DOREPLIFETIME(ABaseCharacter, movementSpeed);
 	DOREPLIFETIME(ABaseCharacter, movementSpeedMod);
 	DOREPLIFETIME(ABaseCharacter, IsChargingAnAttack);
-	DOREPLIFETIME(ABaseCharacter, basicAbility);
 }
 
 
@@ -84,26 +83,29 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
-
-void ABaseCharacter::DamageObject_Implementation(float damage, AActor * attacker, float knockBackDistance, FVector knockBackDir)
+/*
+void ABaseCharacter::DamageObject_Implementation(int32 damage, AActor * attacker, float knockBackDistance, FVector knockBackDir)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Hit"));
+	//UE_LOG(LogTemp, Display, TEXT("%s attacked %d for %f damage"), *attacker->GetName(), *GetName(), damage);
 
-	SetHealthCurrent(GetHealthCurrent() - damage);
+	FDamageStruct Damage;
+	Damage.DamageAmount = 2;
+
+	//SetHealthCurrent(GetHealthCurrent() - Damage.DamageAmount);
 
 	if (GetHealthCurrent() <= 0)
 	{
 		CharDeath();
 	}
 }
-
+*/
 // Called when health reaches 0
 void ABaseCharacter::CharDeath()
 {
 	//this->Destroy();
 }
 
-void ABaseCharacter::MoveCharacter/*_Implementation*/(FVector moveDir)
+void ABaseCharacter::MoveCharacter(FVector moveDir)
 {
 	UWorld* world = GetWorld();
 	if (world)
@@ -112,16 +114,10 @@ void ABaseCharacter::MoveCharacter/*_Implementation*/(FVector moveDir)
 		{
 			moveDir.Normalize(1);
 			AddMovementInput(moveDir, movementSpeedMod);
-			//GetCharacterMovement()->MoveSmooth(GetCharacterMovement()->MaxWalkSpeed * moveDir, world->GetDeltaSeconds());
 		}
 	}
 }
-/*
-bool ABaseCharacter::MoveCharacter_Validate(FVector moveDir)
-{
-	return true;
-}
-*/
+
 void ABaseCharacter::UpdateLookingDirection(float rotation)
 {
 	if (rotateToFaceMoveDirection == false)
@@ -135,12 +131,7 @@ void ABaseCharacter::UpdateLookingDirection(float rotation)
 	}
 	
 }
-/*
-bool ABaseCharacter::UpdateLookingDirection_Validate(float rotation)
-{
-	return true;
-}
-*/
+
 void ABaseCharacter::StartAttackCharge_Implementation(FVector attackDir, EAttackSlots attackSlotUsed, FVector mouseLocation)
 {
 	switch (attackSlotUsed)

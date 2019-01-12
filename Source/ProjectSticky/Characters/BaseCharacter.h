@@ -40,24 +40,24 @@ protected:
 	bool rotateToFaceMoveDirection = false;
 
 	// Character stats
-	UPROPERTY(EditAnywhere, Category = "CharacterStats")
+	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
 	float healthMax = 3;
-	UPROPERTY(EditAnywhere, Category = "CharacterStats")
+	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
 	float healthStart = 3;
-	UPROPERTY(EditAnywhere, Category = "CharacterStats")
+	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
 	float healthCurrent;
-	UPROPERTY(EditAnywhere, Category = "CharacterStats")
+	UPROPERTY(EditAnywhere, Category = "Stats|Combat")
 	float CharDamage;
-	UPROPERTY(replicated, VisibleAnywhere, Category = "Combat")
+	UPROPERTY(replicated, VisibleAnywhere, Category = "Stats|Combat")
 	bool IsChargingAnAttack = false;
 
-	UPROPERTY(replicated, EditAnywhere, Category = "CharacterStats")
+	UPROPERTY(replicated, EditAnywhere, Category = "Stats|Utility")
 	float movementSpeed = 600;
-	UPROPERTY(replicated, EditAnywhere, Category = "CharacterStats")
+	UPROPERTY(replicated, EditAnywhere, Category = "Stats|Utility")
 	float movementSpeedMod = 1;
-	UPROPERTY(EditAnywhere, Category = "CharacterStats")
+	UPROPERTY(EditAnywhere, Category = "Stats|Utility")
 	float chargingMovePenalty = 0.5;
-	UPROPERTY(EditAnywhere, Category = "CharacterStats")
+	UPROPERTY(EditAnywhere, Category = "Stats|Combat")
 	float knockBackResistance = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
@@ -71,7 +71,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TSubclassOf<class ABaseAbility> Slot3AbilityClass;
 
-	UPROPERTY(replicated, VisibleAnywhere, Category = "Abilities")
+	UPROPERTY(VisibleAnywhere, Category = "Abilities")
 	ABaseAbility* basicAbility;
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
 	ABaseAbility* secondaryAbility;
@@ -86,11 +86,11 @@ public:
 
 	UPROPERTY()
 	int32 numberOfUsedAttackSlots;
-	
+	/*
 	// Health manipulation interface functions
 	UFUNCTION(BLueprintCallable, BlueprintNativeEvent, Category = "Damage")
-	void DamageObject(float damage, AActor* attacker, float knockBackDistance, FVector knockBackDir);
-	
+	void DamageObject(int32 damage, AActor* attacker, float knockBackDistance, FVector knockBackDir);
+	*/
 	// Called when the health of the character goes below 0
 	UFUNCTION()
 	void CharDeath();

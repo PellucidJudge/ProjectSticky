@@ -3,9 +3,11 @@
 #include "BasePlayerController.h"
 #include "DrawDebugHelpers.h"
 #include "UnrealNetwork.h"
+#include "Engine.h"
 
-ABasePlayerController::ABasePlayerController()
+ABasePlayerController::ABasePlayerController() : Super()
 {
+
 	bReplicates = true;
 
 	PrimaryActorTick.bCanEverTick = true;
@@ -18,8 +20,10 @@ ABasePlayerController::ABasePlayerController()
 	// Component setup
 	root = CreateDefaultSubobject<USceneComponent>("Root");
 	RootComponent = root;
+	cameraBase = CreateDefaultSubobject<USceneComponent>("CameraBase");
+	cameraBase->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	cameraHolder = CreateDefaultSubobject<USceneComponent>("CameraHolder");
-	cameraHolder->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	cameraHolder->AttachToComponent(cameraBase, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	playerCamera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	playerCamera->AttachToComponent(cameraHolder, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	playerCamera->Activate();
@@ -28,6 +32,7 @@ ABasePlayerController::ABasePlayerController()
 	FVector cameraLocOffset = FVector(cameraHorizontalOffset, 0, cameraHeightOffset);
 	cameraHolder->SetRelativeLocation(cameraLocOffset);
 	cameraHolder->SetWorldRotation(FRotator(cameraAngle, 0, 0));
+	cameraBase->SetWorldRotation(FRotator(0, cameraRotation, 0));
 }
 
 void ABasePlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
@@ -35,11 +40,12 @@ void ABasePlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME(ABasePlayerController, useless);
-	//DOREPLIFETIME(ABasePlayerController, movementOnUpdate);
 }
 
 void ABasePlayerController::BeginPlay()
 {
+	Super::BeginPlay();
+
 	UpdateCharRef();
 	if (playerCamera)
 	{
@@ -49,11 +55,15 @@ void ABasePlayerController::BeginPlay()
 
 void ABasePlayerController::Tick(float DeltaSeconds)
 {
+	Super::Tick(DeltaSeconds);
 
 	if (controlledChar)
 	{
 		// Send movement input to possessed character
+		FVector movementOnUpdate = movementOnUpdateSideways + movementOnUpdateForward;
 		controlledChar->MoveCharacter(movementOnUpdate);
+
+		//UE_LOG(LogTemp, Warning, TEXT("MoveRight %s"), *movementOnUpdateSideways.ToString());
 
 		// Line trace to use with the different functions in this frame
 		FHitResult Hit(ForceInit);
@@ -77,11 +87,18 @@ void ABasePlayerController::Tick(float DeltaSeconds)
 	
 }
 
+// Here is whera all player input is set up
 void ABasePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
+	// Movement
 	InputComponent->BindAxis("MoveForward", this, &ABasePlayerController::MoveForwardCommand);
 	InputComponent->BindAxis("MoveRight", this, &ABasePlayerController::MoveRightCommand);
+
+	// Camera controls
+	InputComponent->BindAxis("CameraZoom", this, &ABasePlayerController::CameraZoom);
+
+	// Combat
 	InputComponent->BindAction("BasicAttack", IE_Pressed, this, &ABasePlayerController::AttackCommandCharge_BasicAttack);
 	InputComponent->BindAction("BasicAttack", IE_Released, this, &ABasePlayerController::AttackCommandExe_BasicAttack);
 	InputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ABasePlayerController::AttackCommandCharge_SecondaryAttack);
@@ -100,15 +117,57 @@ void ABasePlayerController::CalcCamera(float DeltaTime, FMinimalViewInfo & OutRe
 }
 
 //_____________________________________________
-// Move Commands
+// Move commands
 void ABasePlayerController::MoveForwardCommand(float value)
 {
-	movementOnUpdate.Y = value;
+	FVector movementForwardAmount = FVector(0, value, 0);
+	FRotator movementForwardRot = FRotator(0, 0, cameraRotation);
+	FVector movementForward = movementForwardRot.RotateVector(movementForwardAmount);
+
+	movementOnUpdateForward = movementForward;
 }
 
 void ABasePlayerController::MoveRightCommand(float value)
 {
-	movementOnUpdate.X = value;
+	
+	FVector movementSidewaysAmount = FVector(value, 0, 0);
+	FRotator movementSidewaysRot = FRotator(0, cameraRotation, 0);
+	FVector movementSideways = movementSidewaysRot.RotateVector(movementSidewaysAmount);
+	
+	//UE_LOG(LogTemp, Warning, TEXT("MoveRight %s"), *movementSidewaysRot.ToString());
+
+	movementOnUpdateSideways = movementSideways;
+}
+
+//______________________________________________
+// Camera control commands
+void ABasePlayerController::CameraZoom(float value)
+{
+	// DOES NOT WORK, CRASHES THE EDITOR AS LONG AS THE LOG COMMAND IS THERE
+	// Crashes when you press a button connected to this function
+	/*
+	if (InputComponent != nullptr)
+	{
+		// Calculate values used when figuring out the camera distance
+		float cameraMaxLengthFrombase = FMath::Sqrt(FMath::Square(cameraHeightOffset) + FMath::Square(cameraHorizontalOffset));
+		float cameraMinLengthFrombase = cameraMaxLengthFrombase * (1 - cameraZoomMax);
+
+		cameraCurrentZoomLength += FMath::Clamp(value * cameraZoomSpeed, cameraMaxLengthFrombase * cameraZoomMax, cameraMaxLengthFrombase);
+		float zoomOffsetVertical = FMath::Sqrt(FMath::Square(cameraMaxLengthFrombase) - FMath::Square(cameraHorizontalOffset));
+		float zoomOffsetHorizontal = FMath::Sqrt(FMath::Square(cameraMaxLengthFrombase) - FMath::Square(cameraHeightOffset));
+		FVector newZoomOffset = FVector(0, -zoomOffsetHorizontal, zoomOffsetVertical);
+
+		UE_LOG(LogTemp, Warning, TEXT("MoveRight %s"), value);
+
+		// Add offsets together and set the new location of the camera
+		FVector newCameraLocation = newZoomOffset;
+		cameraHolder->SetRelativeLocation(newCameraLocation);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("InputComponent NULL"));
+	}
+	*/
 }
 
 //______________________________________________
