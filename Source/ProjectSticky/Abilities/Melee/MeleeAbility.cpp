@@ -10,6 +10,11 @@ AMeleeAbility::AMeleeAbility() : Super()
 
 }
 
+void AMeleeAbility::BeginPlay()
+{
+
+}
+
 void AMeleeAbility::ChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 	ServerChargeAbility(user, direction, mouseLocation);
@@ -110,9 +115,9 @@ void AMeleeAbility::ServerExecuteAbility_Implementation(AActor * user, FVector d
 
 						if (HMInterface != nullptr && hitActor != nullptr)
 						{
-							//HMInterface->Execute_DamageObject(hitActor, damage, user, 100, direction);
+							HMInterface->Execute_DamageObject(hitActor, abilityDamage, user, 100, direction);
 
-							//UE_LOG(LogTemp, Warning, TEXT("HitActorName: %s") *Hit.Actor->GetName());
+							UE_LOG(LogTemp, Warning, TEXT("HitActorName: %s"), *Hit.Actor->GetName());
 						}
 					}
 				}

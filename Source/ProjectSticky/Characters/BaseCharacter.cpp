@@ -30,6 +30,8 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetHealthCurrent(healthStart);
+
 	// Create ability instances
 	UWorld* world = GetWorld();
 	if (world != nullptr)
@@ -83,22 +85,127 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
-/*
-void ABaseCharacter::DamageObject_Implementation(int32 damage, AActor * attacker, float knockBackDistance, FVector knockBackDir)
+
+void ABaseCharacter::DamageObject_Implementation(TArray<FDamageStruct>& damage, AActor * attacker, float knockBackDistance, FVector knockBackDir)
 {
-	//UE_LOG(LogTemp, Display, TEXT("%s attacked %d for %f damage"), *attacker->GetName(), *GetName(), damage);
+	
+	for (FDamageStruct damageStruct : damage)
+	{
+		float totalPhysicalDamage = 0;
+		float totalFireDamage = 0;
+		float totalColdDamage = 0;
+		float totalElectricDamage = 0;
+		float totalCorrosiveDamage = 0;
 
-	FDamageStruct Damage;
-	Damage.DamageAmount = 2;
+		// Calculate and apply the damage
+		// Log the damage event
+		switch (damageStruct.damageType)
+		{
+		// Physical follows rules as normal, destroys armor first and then health.
+		// No additional effects in itself
+		case EDamageTypes::DT_Physical:
+			// Handle damage
+			totalPhysicalDamage = damageStruct.damageAmount * defenceAndWeaknesess.physical_DamageMod;
+			StandardDamage(totalPhysicalDamage);
 
-	//SetHealthCurrent(GetHealthCurrent() - Damage.DamageAmount);
+			UE_LOG(LogTemp, Warning, TEXT("DAMAGE LOG: %s attacked %d for %f physicaldamage"), 
+				*attacker->GetName(), *this->GetName(), damageStruct.damageAmount);
+			break;
 
+		// Fire damage behaves according to normal rules, armor first then health
+		// Can have a chance to ignite the attacked but is handled seperately
+		case EDamageTypes::DT_Fire:
+			// Handle damage
+			totalFireDamage = damageStruct.damageAmount * defenceAndWeaknesess.fire_DamageMod;
+			StandardDamage(totalFireDamage);
+
+			UE_LOG(LogTemp, Warning, TEXT("DAMAGE LOG: %s attacked %d for %f firedamage"), 
+				*attacker->GetName(), *this->GetName(), damageStruct.damageAmount);
+			break;
+
+		// Cold damage behaves like normal when it comes to armor and health, armor first then health.
+		// Cold applies frostbite and puts out fires
+		case EDamageTypes::DT_Cold:
+			// Handle damage
+			totalColdDamage = damageStruct.damageAmount * defenceAndWeaknesess.cold_DamageMod;
+			StandardDamage(totalColdDamage);
+
+			UE_LOG(LogTemp, Warning, TEXT("DAMAGE LOG: %s attacked %d for %f colddamage"), 
+				*attacker->GetName(), *this->GetName(), damageStruct.damageAmount);
+			break;
+
+		// Electric ignores armor and damages health directly
+		// No other effects as default
+		case EDamageTypes::DT_Electric:
+			// Handle damage
+			totalElectricDamage = damageStruct.damageAmount * defenceAndWeaknesess.electric_DamageMod;
+			SetHealthCurrent(GetHealthCurrent() - damageStruct.damageAmount);
+
+			UE_LOG(LogTemp, Warning, TEXT("DAMAGE LOG: %s attacked %d for %f electricdamage"), 
+				*attacker->GetName(), *this->GetName(), damageStruct.damageAmount);
+			break;
+
+		// Corrosive damages armor first then health
+		// Corrosive deals double damage towards armor
+		case EDamageTypes::DT_Corrosive:
+			// Handle damage
+			totalCorrosiveDamage = damageStruct.damageAmount * defenceAndWeaknesess.corrosive_DamageMod;
+			// Check if there is armor
+			if (GetArmorCurrent() <= 0)
+			{
+				SetHealthCurrent(GetHealthCurrent() - totalCorrosiveDamage);
+			}
+			// Check if the armor will block the damage
+			else if ((totalCorrosiveDamage * 2) <= GetArmorCurrent())
+			{
+				SetArmorCurrent(GetArmorCurrent() - (totalCorrosiveDamage *2));
+			}
+			else
+			{
+				float remainingHealthDamage = ((totalCorrosiveDamage * 2) - GetArmorCurrent()) / 2;
+				SetHealthCurrent(GetHealthCurrent() - remainingHealthDamage);
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("DAMAGE LOG: %s attacked %d for %f corrosivedamage"), 
+				*attacker->GetName(), *this->GetName(), damageStruct.damageAmount);
+			break;
+
+		default:
+			UE_LOG(LogTemp, Error, TEXT("No corresponding damage type found"));
+			break;
+		}
+
+		
+		UE_LOG(LogTemp, Warning, TEXT("%s has %d hitpoints left out of a total %f hitpoints"), 
+			*GetName(), GetHealthCurrent(), GetHealthMax());
+	}
+	
 	if (GetHealthCurrent() <= 0)
 	{
 		CharDeath();
 	}
 }
-*/
+
+// Function for taking damage in the standard manner, armor first then health
+void ABaseCharacter::StandardDamage(float damageAmount)
+{
+	// Check if there is armor
+	if (GetArmorCurrent() <= 0)
+	{
+		SetHealthCurrent(GetHealthCurrent() - damageAmount);
+	}
+	// Check if the armor will block the damage
+	else if (damageAmount <= GetArmorCurrent())
+	{
+		SetArmorCurrent(GetArmorCurrent() - damageAmount);
+	}
+	else
+	{
+		float remainingHealthDamage = damageAmount - GetArmorCurrent();
+		SetHealthCurrent(GetHealthCurrent() - remainingHealthDamage);
+	}
+}
+
 // Called when health reaches 0
 void ABaseCharacter::CharDeath()
 {
@@ -260,8 +367,11 @@ bool ABaseCharacter::SetIsChargingAttack_Validate(bool value)
 	return true;
 }
 
-float ABaseCharacter::GetHealthCurrent(){ return healthCurrent; }
+float ABaseCharacter::GetHealthCurrent() { return healthCurrent; }
 void ABaseCharacter::SetHealthCurrent(float value){ healthCurrent = value; }
 
-float ABaseCharacter::GetHealthMax(){ return healthMax; }
+float ABaseCharacter::GetHealthMax() { return healthMax; }
 void ABaseCharacter::SetHealthMax(float value) { healthMax = value; }
+
+void ABaseCharacter::SetArmorCurrent(float value) { armorCurrent = value; }
+float ABaseCharacter::GetArmorCurrent() { return armorCurrent; }

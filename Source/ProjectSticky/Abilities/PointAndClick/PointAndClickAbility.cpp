@@ -17,6 +17,7 @@ void APointAndClickAbility::ChargeAbility_Implementation(AActor * user, FVector 
 void APointAndClickAbility::ServerChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 	direction = FVector(direction.X, direction.Y, 0);
+	startPos = mouseLocation;
 
 	UWorld* world = GetWorld();
 	if (world != nullptr && user != nullptr)
@@ -27,7 +28,7 @@ void APointAndClickAbility::ServerChargeAbility_Implementation(AActor * user, FV
 			spawnTransform.SetLocation(mouseLocation);
 			spawnTransform.SetRotation(direction.ToOrientationQuat());
 			spawnTransform.SetScale3D(FVector(1, 1, 1));
-			UGameplayStatics::SpawnEmitterAtLocation(world, PS_AbilityCharge, spawnTransform, true);
+			chargeParticleSystem = UGameplayStatics::SpawnEmitterAtLocation(world, PS_AbilityCharge, spawnTransform, true);
 		}
 	}
 }
@@ -42,6 +43,12 @@ void APointAndClickAbility::ServerExecuteAbility_Implementation(AActor * user, F
 {
 	direction = FVector(direction.X, direction.Y, 0);
 
+	if (chargeParticleSystem != nullptr)
+	{
+		chargeParticleSystem->SetActive(false);
+		chargeParticleSystem->SetVisibility(false);
+	}
+
 	if (user != nullptr)
 	{
 		FVector startPoint = user->GetActorLocation();
@@ -54,7 +61,7 @@ void APointAndClickAbility::ServerExecuteAbility_Implementation(AActor * user, F
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, TEXT("PS_AbilityExecutionPE"));
 				FTransform spawnTransform;
-				spawnTransform.SetLocation(mouseLocation);
+				spawnTransform.SetLocation(startPos);
 				spawnTransform.SetRotation(direction.ToOrientationQuat());
 				spawnTransform.SetScale3D(FVector(1, 1, 1));
 

@@ -63,19 +63,19 @@ struct FDefenceWeaknessStruct
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Modifiers")
-	float physical_DamageMod;
+	float physical_DamageMod = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Modifiers")
-	float fire_DamageMod;
+	float fire_DamageMod = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Modifiers")
-	float cold_DamageMod;
+	float cold_DamageMod = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Modifiers")
-	float electric_DamageMod;
+	float electric_DamageMod = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Modifiers")
-	float corrosive_DamageMod;
+	float corrosive_DamageMod = 1;
 };
 
 /*

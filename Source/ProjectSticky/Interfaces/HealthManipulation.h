@@ -28,7 +28,7 @@ class PROJECTSTICKY_API IHealthManipulation
 public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
-	void DamageObject(FDamageStruct& damage, AActor* attacker, float knockBackDistance, FVector knockBackDir);
+	void DamageObject(TArray<FDamageStruct>& damage, AActor* attacker, float knockBackDistance, FVector knockBackDir);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
 	void KillObject();

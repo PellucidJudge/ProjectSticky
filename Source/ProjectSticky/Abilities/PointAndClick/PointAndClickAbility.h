@@ -24,5 +24,11 @@ public:
 	virtual void ExecuteAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 	virtual void ServerExecuteAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 	
-	
+protected:
+
+	UPROPERTY()
+	FVector startPos;
+	UPROPERTY()
+	UParticleSystemComponent* chargeParticleSystem;
+
 };

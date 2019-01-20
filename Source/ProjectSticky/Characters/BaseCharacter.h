@@ -45,7 +45,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
 	float healthStart = 3;
 	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
-	float healthCurrent;
+	float healthCurrent = 3;
+	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
+	float armorStart = 0;
+	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
+	float armorCurrent = 0;
+	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
+	FDefenceWeaknessStruct defenceAndWeaknesess;
 	UPROPERTY(EditAnywhere, Category = "Stats|Combat")
 	float CharDamage;
 	UPROPERTY(replicated, VisibleAnywhere, Category = "Stats|Combat")
@@ -86,11 +92,15 @@ public:
 
 	UPROPERTY()
 	int32 numberOfUsedAttackSlots;
-	/*
+
 	// Health manipulation interface functions
 	UFUNCTION(BLueprintCallable, BlueprintNativeEvent, Category = "Damage")
-	void DamageObject(int32 damage, AActor* attacker, float knockBackDistance, FVector knockBackDir);
-	*/
+	void DamageObject(TArray<FDamageStruct>& damage, AActor* attacker, float knockBackDistance, FVector knockBackDir);
+
+	// Damage functions
+	UFUNCTION()
+	void StandardDamage(float damageAmount);
+
 	// Called when the health of the character goes below 0
 	UFUNCTION()
 	void CharDeath();
@@ -113,6 +123,7 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "GetSet")
 	void SetIsChargingAttack(bool value);
 
+	// Get and set functions for health
 	UFUNCTION(BlueprintCallable, Category = "GetSet")
 	float GetHealthCurrent();
 	UFUNCTION(BlueprintCallable, Category = "GetSet")
@@ -121,6 +132,12 @@ public:
 	float GetHealthMax();
 	UFUNCTION(BlueprintCallable, Category = "GetSet")
 	void SetHealthMax(float value);
+
+	// Get and set for armor
+	UFUNCTION(BlueprintCallable, Category = "GetSet")
+	void SetArmorCurrent(float value);
+	UFUNCTION(BlueprintCallable, Category = "GetSet")
+	float GetArmorCurrent();
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
