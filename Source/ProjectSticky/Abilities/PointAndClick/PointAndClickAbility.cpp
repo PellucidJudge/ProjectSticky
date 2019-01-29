@@ -9,6 +9,17 @@ APointAndClickAbility::APointAndClickAbility() : Super()
 
 }
 
+void APointAndClickAbility::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void APointAndClickAbility::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+}
+
+
 void APointAndClickAbility::ChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 	ServerChargeAbility(user, direction, mouseLocation);
@@ -16,6 +27,7 @@ void APointAndClickAbility::ChargeAbility_Implementation(AActor * user, FVector 
 
 void APointAndClickAbility::ServerChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
+	isCharging = true;
 	direction = FVector(direction.X, direction.Y, 0);
 	startPos = mouseLocation;
 
@@ -41,6 +53,7 @@ void APointAndClickAbility::ExecuteAbility_Implementation(AActor * user, FVector
 // Called on server to forward information and actually execute the ability 
 void APointAndClickAbility::ServerExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
+	isCharging = false;
 	direction = FVector(direction.X, direction.Y, 0);
 
 	if (chargeParticleSystem != nullptr)

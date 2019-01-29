@@ -88,6 +88,24 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
 	ABaseAbility* slot3Ability;
 
+	UPROPERTY(VisibleAnywhere, Category = "Knockback")
+	bool IsKnockedback = false;
+	UPROPERTY(VisibleAnywhere, Category = "Knockback")
+	FVector knockbackDirection;
+	UPROPERTY(VisibleAnywhere, Category = "Knockback")
+	float currentKnockbackLength = 0;
+	UPROPERTY(VisibleAnywhere, Category = "Knockback")
+	float currentKnockbackProgress = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Knockback")
+	float baseKnockbackSpeedPerSecond = 2500;
+
+	UFUNCTION()
+	void KnockBack_Start(FVector direction, float length);
+	UFUNCTION()
+	void KnockBack_Update(float deltaSeconds);
+	UFUNCTION()
+	void KnockBack_End();
+
 public:	
 
 	UPROPERTY()
@@ -103,7 +121,7 @@ public:
 
 	// Called when the health of the character goes below 0
 	UFUNCTION()
-	void CharDeath();
+	virtual void CharDeath();
 	UFUNCTION()
 	void MoveCharacter(FVector moveDir);
 	UFUNCTION()

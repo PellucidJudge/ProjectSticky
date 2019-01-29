@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
+#include "ProjectSticky/Corpses/BaseCorpse.h"
 #include "BaseEmenyChar.generated.h"
 
 /**
@@ -18,6 +19,10 @@ protected:
 
 	UPROPERTY()
 	bool IsControlleBySlime = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Corpse")
+	TSubclassOf<ABaseCorpse> enemyCorpse;
 	
-	
+public:
+
+	virtual void CharDeath() override;
 };

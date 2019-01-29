@@ -78,6 +78,12 @@ void ABaseCharacter::BeginPlay()
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Update the knockback if the character is currently being knocked back
+	if (IsKnockedback)
+	{
+		KnockBack_Update(DeltaTime);
+	}
 }
 
 // Called to bind functionality to input
@@ -184,6 +190,18 @@ void ABaseCharacter::DamageObject_Implementation(TArray<FDamageStruct>& damage, 
 	{
 		CharDeath();
 	}
+	// Knockback
+	else
+	{
+		if (IsKnockedback == false)
+		{
+			KnockBack_Start(knockBackDir, knockBackDistance);
+		}
+		else
+		{
+
+		}
+	}
 }
 
 // Function for taking damage in the standard manner, armor first then health
@@ -206,10 +224,43 @@ void ABaseCharacter::StandardDamage(float damageAmount)
 	}
 }
 
+// Knockback functions
+void ABaseCharacter::KnockBack_Start(FVector direction, float length)
+{	
+	IsKnockedback = true;
+
+	knockbackDirection = direction;
+	currentKnockbackLength = length;
+	currentKnockbackProgress = 0;
+}
+
+void ABaseCharacter::KnockBack_Update(float deltaSeconds)
+{
+	if (currentKnockbackProgress >= currentKnockbackLength)
+	{
+		KnockBack_End();
+	}
+	else
+	{
+		currentKnockbackProgress = currentKnockbackProgress + (baseKnockbackSpeedPerSecond * deltaSeconds);
+
+		float knockbackLength = (baseKnockbackSpeedPerSecond * deltaSeconds);
+		FVector frameMovement = knockbackDirection * knockbackLength;
+		frameMovement.Z = 0;
+
+		this->SetActorLocation(GetActorLocation() + frameMovement, true);
+	}
+}
+
+void ABaseCharacter::KnockBack_End()
+{
+	IsKnockedback = false;
+}
+
 // Called when health reaches 0
 void ABaseCharacter::CharDeath()
 {
-	//this->Destroy();
+	
 }
 
 void ABaseCharacter::MoveCharacter(FVector moveDir)
@@ -241,6 +292,8 @@ void ABaseCharacter::UpdateLookingDirection(float rotation)
 
 void ABaseCharacter::StartAttackCharge_Implementation(FVector attackDir, EAttackSlots attackSlotUsed, FVector mouseLocation)
 {
+	movementSpeedMod = 0.5;
+
 	switch (attackSlotUsed)
 	{
 	case EAttackSlots::AS_BasicAttack:
@@ -286,10 +339,11 @@ void ABaseCharacter::StartAttackCharge_Implementation(FVector attackDir, EAttack
 }
 void ABaseCharacter::InterruptAttackCharge_Implementation()
 {
+	movementSpeedMod = 1;
 }
 void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attackSlotUsed, FVector mouseLocation)
 {
-	
+	movementSpeedMod = 1;
 
 	switch (attackSlotUsed)
 	{
@@ -350,22 +404,8 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 
 // Get and set functions
 bool ABaseCharacter::GetIsChargingAttack() { return IsChargingAnAttack; }
-void ABaseCharacter::SetIsChargingAttack_Implementation(bool value) 
-{ 
-	IsChargingAnAttack = value; 
-	if (value == true)
-	{
-		movementSpeedMod = 0.5;
-	}
-	else
-	{
-		movementSpeedMod = 1;
-	}
-}
-bool ABaseCharacter::SetIsChargingAttack_Validate(bool value)
-{
-	return true;
-}
+void ABaseCharacter::SetIsChargingAttack_Implementation(bool value) { IsChargingAnAttack = value; }
+bool ABaseCharacter::SetIsChargingAttack_Validate(bool value) { return true; }
 
 float ABaseCharacter::GetHealthCurrent() { return healthCurrent; }
 void ABaseCharacter::SetHealthCurrent(float value){ healthCurrent = value; }

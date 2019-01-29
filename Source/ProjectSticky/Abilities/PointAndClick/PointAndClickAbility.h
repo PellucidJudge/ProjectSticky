@@ -18,6 +18,8 @@ public:
 
 	APointAndClickAbility();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	virtual void ChargeAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 	virtual void ServerChargeAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 
@@ -25,6 +27,8 @@ public:
 	virtual void ServerExecuteAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 	
 protected:
+
+	virtual void BeginPlay() override;
 
 	UPROPERTY()
 	FVector startPos;

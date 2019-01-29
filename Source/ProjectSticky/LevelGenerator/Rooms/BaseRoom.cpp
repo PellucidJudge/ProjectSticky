@@ -14,17 +14,6 @@ ABaseRoom::ABaseRoom()
 	folderBaseMeshes = CreateDefaultSubobject<USceneComponent>("FolderBaseMeshes");
 	folderBaseMeshes->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
-	/*
-	//TestStuff
-	testComponent = CreateAbstractDefaultSubobject<UStaticMeshComponent>("test");
-	testComponent->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> testComponentAsset(TEXT("/Game/Art/Meshes/PlaceHolder/PlaceHolderDungeon_Floor.PlaceHolderDungeon_Floor"));
-	if (testComponentAsset.Succeeded())
-	{
-		testComponent->SetStaticMesh(testComponentAsset.Object);
-	}
-	*/
-
 	// Create the array
 	for (int32 XIndex = 0; XIndex < roomSizeX; XIndex++)
 	{
@@ -44,34 +33,85 @@ ABaseRoom::ABaseRoom()
 	}
 
 	// Identify what tile type each tile is
+	for (int32 XIndex = 0; XIndex < roomSizeX; XIndex++)
+	{
+		for (int32 YIndex = 0; YIndex < roomSizeY; YIndex++)
+		{
+			// This currently assumes a rectangle room
+
+			// First and last row walls and corners
+			if (XIndex == 0 || XIndex == roomSizeX - 1)
+			{
+				if (YIndex == 0)
+				{
+					SetRoomTileType(XIndex, YIndex, ETileType::TT_Corner);
+				}
+				else if (YIndex == roomSizeY - 1)
+				{
+					SetRoomTileType(XIndex, YIndex, ETileType::TT_Corner);
+				}
+				else
+				{
+					SetRoomTileType(XIndex, YIndex, ETileType::TT_Wall);
+				}
+			}
+
+			// Middle rows are walls and floors
+			else
+			{
+				if (YIndex == 0)
+				{
+					SetRoomTileType(XIndex, YIndex, ETileType::TT_Wall);
+				}
+				else if (YIndex == roomSizeY - 1)
+				{
+					SetRoomTileType(XIndex, YIndex, ETileType::TT_Wall);
+				}
+				else
+				{
+					SetRoomTileType(XIndex, YIndex, ETileType::TT_Floor);
+				}
+			}
+		}
+	}
+
 
 	// Set mesh types
 	for (int32 XIndex = 0; XIndex < roomSizeX; XIndex++)
 	{
 		for (int32 YIndex = 0; YIndex < roomSizeY; YIndex++)
-		{
-
-			static ConstructorHelpers::FObjectFinder<UStaticMesh> testComponentAsset(TEXT("/Game/Art/Meshes/PlaceHolder/PlaceHolderDungeon_Floor.PlaceHolderDungeon_Floor"));
-			if (testComponentAsset.Succeeded() && tileGrid.Num() > 0)
-			{
-				tileGrid[XIndex + roomSizeX * YIndex].mainMesh->SetStaticMesh(testComponentAsset.Object);
-			}
-
-			if (roomMeshes_Floors.Num() > 0)
-			{
-				SetRoomTileMesh(XIndex, YIndex, GetRandomMeshInArray(roomMeshes_Floors));
-			}
-			
+		{	
 			// Set mesh
-			switch (GetTileType(XIndex,YIndex))
+			/*
+			if (roomStyleDataTable == nullptr)
 			{
-			case ETileType::TT_Floor :
+				UE_LOG(LogTemp, Error, TEXT("Tried to add data table"));
+				static ConstructorHelpers::FObjectFinder<UDataTable> roomStyleDataTable(TEXT("DataTable'/Game/Misc/DataTables/DT_LvlStyle_Placeholder.DT_LvlStyle_Placeholder'"));
+			}
+			//	DataTable stuff
+			
+			static const FString ContextString(TEXT("GENERAL"));
+			FRoomStyle* floorStruct = roomStyleDataTable->FindRow<FRoomStyle>(FName(TEXT("Floors")), ContextString, true);
+			FRoomStyle* wallStruct = roomStyleDataTable->FindRow<FRoomStyle>(FName(TEXT("Walls")), ContextString, true);
+			FRoomStyle* cornerStruct = roomStyleDataTable->FindRow<FRoomStyle>(FName(TEXT("Corners")), ContextString, true);
+			*/
+			
+
+			switch (GetTileType(XIndex, YIndex))
+			{
+			case ETileType::TT_Floor:
+				UE_LOG(LogTemp, Log, TEXT("FLOOR created at local room coords: %d,%d"), XIndex, YIndex);
+				SetRoomTileMesh(XIndex, YIndex, floorMeshAsset);
 				break;
 
-			case ETileType::TT_Wall :
+			case ETileType::TT_Wall:
+				UE_LOG(LogTemp, Log, TEXT("WALL created at local room coords: %d,%d"), XIndex, YIndex);
+				SetRoomTileMesh(XIndex, YIndex, wallMeshAsset);
 				break;
 
-			case ETileType::TT_Corner :
+			case ETileType::TT_Corner:
+				UE_LOG(LogTemp, Log, TEXT("CORNER created at local room coords: %d,%d"), XIndex, YIndex);
+				SetRoomTileMesh(XIndex, YIndex, cornerMeshAsset);
 				break;
 
 			default:
@@ -91,18 +131,6 @@ ABaseRoom::ABaseRoom()
 void ABaseRoom::BeginPlay()
 {
 	Super::BeginPlay();
-	/*
-	UE_LOG(LogTemp, Warning, TEXT("Hej"));
-
-	if (roomMeshes_Floors.Num() > 0)
-	{
-		if (roomMeshes_Floors[0] != nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("%s"), tileGrid.Num());
-		}
-		
-	}
-	*/
 }
 
 // Called every frame
@@ -137,9 +165,15 @@ ETileType ABaseRoom::GetTileType(int32 XIndex, int32 YIndex)
 	return returnTileType;
 }
 
-void ABaseRoom::SetRoomTileMesh(int32 XIndex, int32 YIndex, UStaticMesh * mesh)
+void ABaseRoom::SetRoomTileMesh(int32 XIndex, int32 YIndex, FString meshAsset)
 {
-	tileGrid[XIndex + roomSizeX * YIndex].mainMesh->SetStaticMesh(mesh);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> floorMesh(*meshAsset);
+	if (floorMesh.Succeeded())
+	{
+		int32 index = XIndex + roomSizeX * YIndex;
+		tileGrid[index].mainMesh->SetStaticMesh(floorMesh.Object);
+	}
+	else UE_LOG(LogTemp, Warning, TEXT("No mesh found when generating room"));
 }
 
 void ABaseRoom::SetRoomTileType(int32 XIndex, int32 YIndex, ETileType tileType)

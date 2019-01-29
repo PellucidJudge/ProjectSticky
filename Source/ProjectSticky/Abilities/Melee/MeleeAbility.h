@@ -19,6 +19,8 @@ public:
 
 	AMeleeAbility();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	virtual void ChargeAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 	virtual void ServerChargeAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 
@@ -31,6 +33,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Damage")
 	TArray<FDamageStruct> abilityDamage;
+
+	UPROPERTY()
+	UParticleSystemComponent* PSC_ChargeParticles;
 
 	//UFUNCTION()
 	//bool DamageActor(AActor * actor);

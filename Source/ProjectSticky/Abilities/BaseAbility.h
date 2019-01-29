@@ -32,6 +32,8 @@ public:
 
 	ABaseAbility();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	// Time taken for the ability to fully charge
 	UPROPERTY(EditAnywhere, Category = "Ability Stats")
 	float fullChargeTime = 0.5;
@@ -54,6 +56,12 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void SpawnParticleEffect(UParticleSystem* particleSystem, FTransform worldTransform);
+	UFUNCTION()
+	UParticleSystemComponent* SpawnLastingParticleEffect(UParticleSystem* particleSystem, FTransform worldTransform);
+
+
 	// Base damage for the ability
 	UPROPERTY(EditAnywhere, Category = "Ability Stats")
 	TArray<FDamage> AbilityBaseDamage;
@@ -61,6 +69,11 @@ protected:
 	// Generic damage modifier
 	UPROPERTY(EditAnywhere, Category = "Ability Stats")
 	float overallDamageMod = 1;
+
+	UPROPERTY()
+	bool isCharging = false;
+	UPROPERTY()
+	AActor* currentUser;
 
 	// These are the base VFX systems most effects will make use of.
 	// What these systems are depends on ability, will be set in BP child classess

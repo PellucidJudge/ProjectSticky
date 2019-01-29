@@ -12,7 +12,20 @@ AMeleeAbility::AMeleeAbility() : Super()
 
 void AMeleeAbility::BeginPlay()
 {
+	Super::BeginPlay();
+}
 
+void AMeleeAbility::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (isCharging == true)
+	{
+		if (PSC_ChargeParticles != nullptr && currentUser != nullptr)
+		{
+			PSC_ChargeParticles->SetWorldLocation(currentUser->GetActorLocation());
+		}
+	}
 }
 
 void AMeleeAbility::ChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
@@ -22,6 +35,8 @@ void AMeleeAbility::ChargeAbility_Implementation(AActor * user, FVector directio
 
 void AMeleeAbility::ServerChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
+	isCharging = true;
+	currentUser = user;
 	direction = FVector(direction.X, direction.Y, 0);
 
 	UWorld* world = GetWorld();
@@ -33,7 +48,17 @@ void AMeleeAbility::ServerChargeAbility_Implementation(AActor * user, FVector di
 			spawnTransform.SetLocation(user->GetActorLocation());
 			spawnTransform.SetRotation(direction.ToOrientationQuat());
 			spawnTransform.SetScale3D(FVector(1, 1, 1));
-			UGameplayStatics::SpawnEmitterAtLocation(world, PS_AbilityCharge, spawnTransform, true);
+			
+			if (PSC_ChargeParticles == nullptr)
+			{
+				PSC_ChargeParticles = SpawnLastingParticleEffect(PS_AbilityCharge, spawnTransform);
+			}
+			else
+			{
+				PSC_ChargeParticles->SetWorldTransform(spawnTransform);
+				PSC_ChargeParticles->SetVisibility(true);
+				PSC_ChargeParticles->Activate();
+			}
 		}
 	}
 }
@@ -58,6 +83,7 @@ void AMeleeAbility::ExecuteAbility_Implementation(AActor * user, FVector directi
 // Called on server to forward information and actually execute the ability 
 void AMeleeAbility::ServerExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
+	isCharging = false;
 	direction = FVector(direction.X, direction.Y, 0);
 
 	if (GEngine)
@@ -70,6 +96,13 @@ void AMeleeAbility::ServerExecuteAbility_Implementation(AActor * user, FVector d
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Black, TEXT("CLIENT"));
 		}
+	}
+
+	// Disable charge particle effect
+	if (PSC_ChargeParticles != nullptr)
+	{
+		PSC_ChargeParticles->SetActive(false);
+		PSC_ChargeParticles->SetVisibility(false);
 	}
 
 	if (user != nullptr)
@@ -88,7 +121,7 @@ void AMeleeAbility::ServerExecuteAbility_Implementation(AActor * user, FVector d
 				spawnTransform.SetRotation(direction.ToOrientationQuat());
 				spawnTransform.SetScale3D(FVector(1, 1, 1));
 
-				UGameplayStatics::SpawnEmitterAtLocation(world, PS_AbilityExecutionPE, spawnTransform, true);
+				SpawnParticleEffect(PS_AbilityExecutionPE, spawnTransform);
 			}
 
 			// Hit detection

@@ -31,6 +31,18 @@ struct FTileStruct
 
 };
 
+USTRUCT(BlueprintType)
+struct FRoomStyle : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Descriptor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FString> AssetPaths;
+};
+
 UCLASS()
 class PROJECTSTICKY_API ABaseRoom : public AActor
 {
@@ -66,26 +78,26 @@ protected:
 	// Arrays Containing the style (intended to be switched out with datatables later)
 	UPROPERTY(EditAnywhere, Category = "RoomStyle")
 	UDataTable* roomStyleDataTable;
+
+	// TEMPORARY "DATATABLE" for the meshes
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomStyle")
-	TArray<UStaticMesh*> roomMeshes_Corners;
+	FString floorMeshAsset = "/Game/Art/Meshes/PlaceHolder/PlaceHolderDungeon_Floor.PlaceHolderDungeon_Floor";
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomStyle")
-	TArray<UStaticMesh*> roomMeshes_Walls;
+	FString wallMeshAsset = "/Game/Art/Meshes/PlaceHolder/PlaceHolderDungeon_Wall.PlaceHolderDungeon_Wall";
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomStyle")
-	TArray<UStaticMesh*> roomMeshes_Floors;
+	FString cornerMeshAsset = "/Game/Art/Meshes/PlaceHolder/PlaceHolderDungeon_Corner.PlaceHolderDungeon_Corner";
 
 	UPROPERTY()
 	TArray<FTileStruct> tileGrid;
 
-
 	UFUNCTION()
 	UStaticMesh* GetRandomMeshInArray(TArray<UStaticMesh*> meshArray);
-
 	UFUNCTION()
 	UStaticMeshComponent* GetTileMesh(int32 XIndex, int32 YIndex);
 	UFUNCTION()
 	ETileType GetTileType(int32 XIndex, int32 YIndex);
 	UFUNCTION()
-	void SetRoomTileMesh(int32 XIndex, int32 YIndex, UStaticMesh* mesh);
+	void SetRoomTileMesh(int32 XIndex, int32 YIndex, FString meshAsset);
 	UFUNCTION()
 	void SetRoomTileType(int32 XIndex, int32 YIndex, ETileType tileType);
 
