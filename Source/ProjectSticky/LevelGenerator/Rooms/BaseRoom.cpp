@@ -96,7 +96,7 @@ ABaseRoom::ABaseRoom()
 			FRoomStyle* cornerStruct = roomStyleDataTable->FindRow<FRoomStyle>(FName(TEXT("Corners")), ContextString, true);
 			*/
 			
-
+			
 			switch (GetTileType(XIndex, YIndex))
 			{
 			case ETileType::TT_Floor:

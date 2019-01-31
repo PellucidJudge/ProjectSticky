@@ -8,7 +8,7 @@
 ABasePlayerController::ABasePlayerController() : Super()
 {
 
-	bReplicates = true;
+	bReplicates = false;
 
 	PrimaryActorTick.bCanEverTick = true;
 	bAutoManageActiveCameraTarget = false;
