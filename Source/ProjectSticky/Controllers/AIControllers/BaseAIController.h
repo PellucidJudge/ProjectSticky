@@ -29,6 +29,12 @@ public:
 
 	virtual void Possess(APawn* InPawn) override;
 
+	uint8 targetKeyID;
+	uint8 homeLocationKeyID;
+	uint8 wantedLocationKeyID;
+
+	uint8 wantToAttackKeyID;
+
 private:
 
 	virtual void BeginPlay() override;
@@ -39,10 +45,4 @@ private:
 	UBlackboardComponent* blackboardComponent;
 	UPROPERTY(transient)
 	UBehaviorTreeComponent* behaviorTreeComponent;
-
-	uint8 targetKeyID;
-	uint8 homeLocationKeyID;
-	uint8 wantedLocationKeyID;
-
-	uint8 wantToAttackKeyID;
 };

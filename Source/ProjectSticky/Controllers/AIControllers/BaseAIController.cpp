@@ -30,6 +30,7 @@ void ABaseAIController::Possess(APawn * InPawn)
 
 	if (controlledCharRef && controlledCharRef->AIBehavior)
 	{
+
 		blackboardComponent->InitializeBlackboard(*controlledCharRef->AIBehavior->BlackboardAsset);
 
 		targetKeyID = blackboardComponent->GetKeyID("Target");

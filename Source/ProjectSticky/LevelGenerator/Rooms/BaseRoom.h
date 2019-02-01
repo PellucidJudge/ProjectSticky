@@ -81,11 +81,14 @@ protected:
 
 	// TEMPORARY "DATATABLE" for the meshes
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomStyle")
-	FString floorMeshAsset = "/Game/Art/Meshes/PlaceHolder/PlaceHolderDungeon_Floor.PlaceHolderDungeon_Floor";
+	UStaticMesh* floorMeshAsset;
+	//FString floorMeshAsset = "/Game/Art/Meshes/PlaceHolder/PlaceHolderDungeon_Floor.PlaceHolderDungeon_Floor";
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomStyle")
-	FString wallMeshAsset = "/Game/Art/Meshes/PlaceHolder/PlaceHolderDungeon_Wall.PlaceHolderDungeon_Wall";
+	UStaticMesh* wallMeshAsset;
+	//FString wallMeshAsset = "/Game/Art/Meshes/PlaceHolder/PlaceHolderDungeon_Wall.PlaceHolderDungeon_Wall";
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RoomStyle")
-	FString cornerMeshAsset = "/Game/Art/Meshes/PlaceHolder/PlaceHolderDungeon_Corner.PlaceHolderDungeon_Corner";
+	UStaticMesh* cornerMeshAsset;
+	//FString cornerMeshAsset = "/Game/Art/Meshes/PlaceHolder/PlaceHolderDungeon_Corner.PlaceHolderDungeon_Corner";
 
 	UPROPERTY()
 	TArray<FTileStruct> tileGrid;
@@ -97,7 +100,7 @@ protected:
 	UFUNCTION()
 	ETileType GetTileType(int32 XIndex, int32 YIndex);
 	UFUNCTION()
-	void SetRoomTileMesh(int32 XIndex, int32 YIndex, FString meshAsset);
+	void SetRoomTileMesh(int32 XIndex, int32 YIndex, UStaticMesh* meshAsset);
 	UFUNCTION()
 	void SetRoomTileType(int32 XIndex, int32 YIndex, ETileType tileType);
 

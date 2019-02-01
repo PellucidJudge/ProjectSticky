@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Characters/BaseCharacter.h"
+#include "Characters/BaseAICharacter.h"
 #include "ProjectSticky/Corpses/BaseCorpse.h"
 #include "BaseEmenyChar.generated.h"
 
@@ -11,7 +11,7 @@
  * 
  */
 UCLASS()
-class PROJECTSTICKY_API ABaseEmenyChar : public ABaseCharacter
+class PROJECTSTICKY_API ABaseEmenyChar : public ABaseAICharacter
 {
 	GENERATED_BODY()
 	

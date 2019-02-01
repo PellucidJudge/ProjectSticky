@@ -6,14 +6,20 @@
 // Sets default values
 ABaseRoom::ABaseRoom()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	root = CreateDefaultSubobject<USceneComponent>("Root");
 	RootComponent = root;
 	folderBaseMeshes = CreateDefaultSubobject<USceneComponent>("FolderBaseMeshes");
 	folderBaseMeshes->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetIncludingScale);
+}
 
+// Called when the game starts or when spawned
+void ABaseRoom::BeginPlay()
+{
+	Super::BeginPlay();
+	
 	// Create the array
 	for (int32 XIndex = 0; XIndex < roomSizeX; XIndex++)
 	{
@@ -22,7 +28,9 @@ ABaseRoom::ABaseRoom()
 			FTileStruct currentTile;
 
 			// Create mesh components
-			currentTile.mainMesh = CreateDefaultSubobject<UStaticMeshComponent>(*FString("Mesh" + FString::FromInt(XIndex + roomSizeX * YIndex)));
+			//currentTile.mainMesh = CreateDefaultSubobject<UStaticMeshComponent>(*FString("Mesh" + FString::FromInt(XIndex + roomSizeX * YIndex)));
+			UStaticMeshComponent* Template = nullptr;
+			currentTile.mainMesh = NewObject<UStaticMeshComponent>(this, *FString("Mesh" + FString::FromInt(XIndex + roomSizeX * YIndex)), RF_NoFlags, Template);
 			currentTile.mainMesh->AttachToComponent(folderBaseMeshes, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
 			// Set base value
@@ -74,28 +82,28 @@ ABaseRoom::ABaseRoom()
 			}
 		}
 	}
-
+	
 
 	// Set mesh types
 	for (int32 XIndex = 0; XIndex < roomSizeX; XIndex++)
 	{
 		for (int32 YIndex = 0; YIndex < roomSizeY; YIndex++)
-		{	
+		{
 			// Set mesh
 			/*
 			if (roomStyleDataTable == nullptr)
 			{
-				UE_LOG(LogTemp, Error, TEXT("Tried to add data table"));
-				static ConstructorHelpers::FObjectFinder<UDataTable> roomStyleDataTable(TEXT("DataTable'/Game/Misc/DataTables/DT_LvlStyle_Placeholder.DT_LvlStyle_Placeholder'"));
+			UE_LOG(LogTemp, Error, TEXT("Tried to add data table"));
+			static ConstructorHelpers::FObjectFinder<UDataTable> roomStyleDataTable(TEXT("DataTable'/Game/Misc/DataTables/DT_LvlStyle_Placeholder.DT_LvlStyle_Placeholder'"));
 			}
 			//	DataTable stuff
-			
+
 			static const FString ContextString(TEXT("GENERAL"));
 			FRoomStyle* floorStruct = roomStyleDataTable->FindRow<FRoomStyle>(FName(TEXT("Floors")), ContextString, true);
 			FRoomStyle* wallStruct = roomStyleDataTable->FindRow<FRoomStyle>(FName(TEXT("Walls")), ContextString, true);
 			FRoomStyle* cornerStruct = roomStyleDataTable->FindRow<FRoomStyle>(FName(TEXT("Corners")), ContextString, true);
 			*/
-			
+
 			
 			switch (GetTileType(XIndex, YIndex))
 			{
@@ -117,20 +125,16 @@ ABaseRoom::ABaseRoom()
 			default:
 				break;
 			}
+
 			
 			//Set location
-			FVector tileLocation = FVector(ROOMTILEWIDTH * XIndex, ROOMTILEWIDTH * YIndex, 0);
-			tileGrid[XIndex + roomSizeX * YIndex].mainMesh->SetRelativeLocation(tileLocation);
-
+			if (tileGrid[XIndex + roomSizeX * YIndex].mainMesh)
+			{
+				FVector tileLocation = FVector(ROOMTILEWIDTH * XIndex, ROOMTILEWIDTH * YIndex, 0);
+				tileGrid[XIndex + roomSizeX * YIndex].mainMesh->SetRelativeLocation(tileLocation);
+			}
 		}
 	}
-
-}
-
-// Called when the game starts or when spawned
-void ABaseRoom::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 // Called every frame
@@ -165,13 +169,13 @@ ETileType ABaseRoom::GetTileType(int32 XIndex, int32 YIndex)
 	return returnTileType;
 }
 
-void ABaseRoom::SetRoomTileMesh(int32 XIndex, int32 YIndex, FString meshAsset)
+void ABaseRoom::SetRoomTileMesh(int32 XIndex, int32 YIndex, UStaticMesh* meshAsset)
 {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> floorMesh(*meshAsset);
-	if (floorMesh.Succeeded())
+	int32 index = XIndex + roomSizeX * YIndex;
+
+	if (meshAsset && tileGrid[index].mainMesh)
 	{
-		int32 index = XIndex + roomSizeX * YIndex;
-		tileGrid[index].mainMesh->SetStaticMesh(floorMesh.Object);
+		tileGrid[index].mainMesh->SetStaticMesh(meshAsset);
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No mesh found when generating room"));
 }
