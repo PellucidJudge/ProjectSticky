@@ -22,6 +22,15 @@ enum class EAttackSlots : uint8
 	AS_Slot3			UMETA(DisplayName = "AttackSlot3")
 };
 
+UENUM(BlueprintType)
+enum class ECharState : uint8
+{
+	CS_Idle			UMETA(DisplayName = "Idle"),
+	CS_Moving		UMETA(DisplayName = "Moving"),
+	CS_Charging		UMETA(DisplayName = "Charging"),
+	CS_Dead			UMETA(DisplayName = "Dead")
+};
+
 UCLASS()
 class PROJECTSTICKY_API ABaseCharacter : public ACharacter, public IHealthManipulation
 {
@@ -54,8 +63,8 @@ protected:
 	FDefenceWeaknessStruct defenceAndWeaknesess;
 	UPROPERTY(EditAnywhere, Category = "Stats|Combat")
 	float CharDamage;
-	UPROPERTY(replicated, VisibleAnywhere, Category = "Stats|Combat")
-	bool IsChargingAnAttack = false;
+	UPROPERTY(EditAnywhere, Category = "Stats|Combat")
+	ECharState currentCharState = ECharState::CS_Idle;
 
 	UPROPERTY(replicated, EditAnywhere, Category = "Stats|Utility")
 	float movementSpeed = 600;
@@ -137,9 +146,9 @@ public:
 
 	// Get and set functions
 	UFUNCTION(BlueprintCallable, Category = "GetSet")
-	bool GetIsChargingAttack();
+	ECharState GetCharState();
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "GetSet")
-	void SetIsChargingAttack(bool value);
+	void SetCharState(ECharState value);
 
 	// Get and set functions for health
 	UFUNCTION(BlueprintCallable, Category = "GetSet")

@@ -104,6 +104,7 @@ void ABasePlayerController::SetupInputComponent()
 	InputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ABasePlayerController::AttackCommandCharge_SecondaryAttack);
 	InputComponent->BindAction("SecondaryAttack", IE_Released, this, &ABasePlayerController::AttackCommandExe_SecondaryAttack);
 	InputComponent->BindAction("LeavePossessedBody", IE_Pressed, this, &ABasePlayerController::ReturnToSlimeForm);
+	InputComponent->BindAction("PossessBody", IE_Pressed, this, &ABasePlayerController::Command_PossessEnemy);
 }
 
 void ABasePlayerController::CalcCamera(float DeltaTime, FMinimalViewInfo & OutResult)
@@ -220,8 +221,15 @@ void ABasePlayerController::AttackCommandCharge_Slot3() { StartAttackCharge(EAtt
 
 // When the player releases the attack button or other criterias are met the attack goes through.
 void ABasePlayerController::AttackCommandExe_BasicAttack() { AttackCommand(EAttackSlots::AS_BasicAttack); }
-void ABasePlayerController::AttackCommandExe_SecondaryAttack() 
-{ 
+void ABasePlayerController::AttackCommandExe_SecondaryAttack() { AttackCommand(EAttackSlots::AS_SecondaryAttack); }
+void ABasePlayerController::AttackCommandExe_Slot1() { AttackCommand(EAttackSlots::AS_Slot1); }
+void ABasePlayerController::AttackCommandExe_Slot2() { AttackCommand(EAttackSlots::AS_Slot2); }
+void ABasePlayerController::AttackCommandExe_Slot3() { AttackCommand(EAttackSlots::AS_Slot3); }
+
+// Enemy possession functions
+// Possess command
+void ABasePlayerController::Command_PossessEnemy()
+{
 	if (IsControllingEnemy == false)
 	{
 		ABaseEmenyChar* enemy = TryPossessEnemy();
@@ -231,13 +239,8 @@ void ABasePlayerController::AttackCommandExe_SecondaryAttack()
 			IsControllingEnemy = true;
 		}
 	}
-	AttackCommand(EAttackSlots::AS_SecondaryAttack); 
 }
-void ABasePlayerController::AttackCommandExe_Slot1() { AttackCommand(EAttackSlots::AS_Slot1); }
-void ABasePlayerController::AttackCommandExe_Slot2() { AttackCommand(EAttackSlots::AS_Slot2); }
-void ABasePlayerController::AttackCommandExe_Slot3() { AttackCommand(EAttackSlots::AS_Slot3); }
 
-// Enemy possession functions
 ABaseEmenyChar* ABasePlayerController::TryPossessEnemy()
 {
 	if (slimeCharacter != nullptr)

@@ -15,7 +15,7 @@ void ABaseSlimeChar::SetSlimeActive_Implementation(bool value)
 		GetMesh()->SetVisibility(true);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		GetCapsuleComponent()->SetEnableGravity(true);
-		this->SetIsChargingAttack(false);
+		this->SetCharState(ECharState::CS_Idle);
 	}
 	else 
 	{
@@ -23,6 +23,6 @@ void ABaseSlimeChar::SetSlimeActive_Implementation(bool value)
 		GetMesh()->SetVisibility(false);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetCapsuleComponent()->SetEnableGravity(false);
-		this->SetIsChargingAttack(false);
+		this->SetCharState(ECharState::CS_Idle);
 	}
 }

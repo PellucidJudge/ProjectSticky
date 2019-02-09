@@ -115,6 +115,8 @@ protected:
 	void AttackCommandExe_Slot3();
 
 	UFUNCTION()
+	void Command_PossessEnemy();
+	UFUNCTION()
 	ABaseEmenyChar* TryPossessEnemy();
 	UFUNCTION()
 	bool TakePossessionOfEnemyChar(ABaseEmenyChar* enemyToPossess);

@@ -35,4 +35,9 @@ protected:
 	UPROPERTY()
 	UParticleSystemComponent* chargeParticleSystem;
 
+	UPROPERTY()
+	float psEndSize = 2;
+	UPROPERTY()
+	float psCurrentSizeProgression;
+
 };

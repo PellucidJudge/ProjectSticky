@@ -21,7 +21,7 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutL
 
 	DOREPLIFETIME(ABaseCharacter, movementSpeed);
 	DOREPLIFETIME(ABaseCharacter, movementSpeedMod);
-	DOREPLIFETIME(ABaseCharacter, IsChargingAnAttack);
+	//DOREPLIFETIME(ABaseCharacter, IsChargingAnAttack);
 }
 
 
@@ -30,6 +30,13 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*
+	if (GetMesh() != nullptr)
+	{
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		GetMesh()->SetAllBodiesSimulatePhysics(true);
+	}
+	*/
 	SetHealthCurrent(healthStart);
 
 	// Create ability instances
@@ -260,18 +267,28 @@ void ABaseCharacter::KnockBack_End()
 // Called when health reaches 0
 void ABaseCharacter::CharDeath()
 {
-	
+	SetCharState(ECharState::CS_Dead);
+
+	GetCharacterMovement()->GravityScale = 0;
+	if (GetMesh() != nullptr)
+	{
+		GetMesh()->SetVisibility(false);
+	}
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABaseCharacter::MoveCharacter(FVector moveDir)
 {
-	UWorld* world = GetWorld();
-	if (world)
+	if (currentCharState != ECharState::CS_Dead)
 	{
-		if (moveDir.GetSafeNormal(1) != FVector(0, 0, 0))
+		UWorld* world = GetWorld();
+		if (world)
 		{
-			moveDir.Normalize(1);
-			AddMovementInput(moveDir, movementSpeedMod);
+			if (moveDir.GetSafeNormal(1) != FVector(0, 0, 0))
+			{
+				moveDir.Normalize(1);
+				AddMovementInput(moveDir, movementSpeedMod);
+			}
 		}
 	}
 }
@@ -299,7 +316,7 @@ void ABaseCharacter::StartAttackCharge_Implementation(FVector attackDir, EAttack
 	case EAttackSlots::AS_BasicAttack:
 		if (basicAbility != nullptr)
 		{
-			SetIsChargingAttack(true);
+			SetCharState(ECharState::CS_Charging);
 			basicAbility->ChargeAbility(this, attackDir, mouseLocation);
 		}
 		break;
@@ -307,7 +324,7 @@ void ABaseCharacter::StartAttackCharge_Implementation(FVector attackDir, EAttack
 	case EAttackSlots::AS_SecondaryAttack:
 		if (secondaryAbility != nullptr)
 		{
-			SetIsChargingAttack(true);
+			SetCharState(ECharState::CS_Charging);
 			secondaryAbility->ChargeAbility(this, attackDir, mouseLocation);
 		}
 		break;
@@ -315,7 +332,7 @@ void ABaseCharacter::StartAttackCharge_Implementation(FVector attackDir, EAttack
 	case EAttackSlots::AS_Slot1:
 		if (slot1Ability != nullptr)
 		{
-			SetIsChargingAttack(true);
+			SetCharState(ECharState::CS_Charging);
 			slot1Ability->ChargeAbility(this, attackDir, mouseLocation);
 		}
 		break;
@@ -323,7 +340,7 @@ void ABaseCharacter::StartAttackCharge_Implementation(FVector attackDir, EAttack
 	case EAttackSlots::AS_Slot2:
 		if (slot2Ability != nullptr)
 		{
-			SetIsChargingAttack(true);
+			SetCharState(ECharState::CS_Charging);
 			slot2Ability->ChargeAbility(this, attackDir, mouseLocation);
 		}
 		break;
@@ -331,7 +348,7 @@ void ABaseCharacter::StartAttackCharge_Implementation(FVector attackDir, EAttack
 	case EAttackSlots::AS_Slot3:
 		if (slot3Ability != nullptr)
 		{
-			SetIsChargingAttack(true);
+			SetCharState(ECharState::CS_Charging);
 			slot3Ability->ChargeAbility(this, attackDir, mouseLocation);
 		}
 		break;
@@ -348,7 +365,7 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 	switch (attackSlotUsed)
 	{
 	case EAttackSlots::AS_BasicAttack:
-		if (GetIsChargingAttack())
+		if (GetCharState() == ECharState::CS_Charging)
 		{
 			if (basicAbility != nullptr)
 			{
@@ -358,7 +375,7 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 		break;
 
 	case EAttackSlots::AS_SecondaryAttack:
-		if (GetIsChargingAttack())
+		if (GetCharState() == ECharState::CS_Charging)
 		{
 			if (secondaryAbility != nullptr)
 			{
@@ -368,7 +385,7 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 		break;
 
 	case EAttackSlots::AS_Slot1:
-		if (GetIsChargingAttack())
+		if (GetCharState() == ECharState::CS_Charging)
 		{
 			if (slot1Ability != nullptr)
 			{
@@ -378,7 +395,7 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 		break;
 
 	case EAttackSlots::AS_Slot2:
-		if (GetIsChargingAttack())
+		if (GetCharState() == ECharState::CS_Charging)
 		{
 			if (slot2Ability != nullptr)
 			{
@@ -388,7 +405,7 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 		break;
 
 	case EAttackSlots::AS_Slot3:
-		if (GetIsChargingAttack())
+		if (GetCharState() == ECharState::CS_Charging)
 		{
 			if (slot3Ability != nullptr)
 			{
@@ -398,14 +415,14 @@ void ABaseCharacter::Attack_Implementation(FVector attackDir, EAttackSlots attac
 		break;
 	}
 
-	SetIsChargingAttack(false);
+	SetCharState(ECharState::CS_Idle);
 }
 
 
 // Get and set functions
-bool ABaseCharacter::GetIsChargingAttack() { return IsChargingAnAttack; }
-void ABaseCharacter::SetIsChargingAttack_Implementation(bool value) { IsChargingAnAttack = value; }
-bool ABaseCharacter::SetIsChargingAttack_Validate(bool value) { return true; }
+ECharState ABaseCharacter::GetCharState() { return currentCharState; }
+void ABaseCharacter::SetCharState_Implementation(ECharState value) { currentCharState = value; }
+bool ABaseCharacter::SetCharState_Validate(ECharState value) { return true; }
 
 float ABaseCharacter::GetHealthCurrent() { return healthCurrent; }
 void ABaseCharacter::SetHealthCurrent(float value){ healthCurrent = value; }

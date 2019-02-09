@@ -5,14 +5,9 @@
 
 void ABaseEmenyChar::CharDeath()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Enemy has died"));
+	Super::CharDeath();
 
-	GetCharacterMovement()->GravityScale = 0;
-	if (GetMesh() != nullptr)
-	{
-		GetMesh()->SetVisibility(false);
-	}
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	UE_LOG(LogTemp, Warning, TEXT("Enemy has died"));
 
 	if (enemyCorpse != nullptr)
 	{

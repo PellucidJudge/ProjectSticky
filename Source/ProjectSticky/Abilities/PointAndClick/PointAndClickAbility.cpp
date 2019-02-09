@@ -2,6 +2,7 @@
 
 #include "PointAndClickAbility.h"
 #include "ProjectSticky/Interfaces/HealthManipulation.h"
+#include "Runtime/Core/Public/Math/UnrealMathUtility.h"
 #include "Engine.h"
 
 APointAndClickAbility::APointAndClickAbility() : Super()
@@ -17,6 +18,14 @@ void APointAndClickAbility::BeginPlay()
 void APointAndClickAbility::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (isCharging)
+	{
+		float newScale = FMath::Lerp(1.0f, psEndSize, psCurrentSizeProgression);
+		//chargeParticleSystem->SetWorldScale3D(FVector(newScale, newScale, newScale));
+
+		psCurrentSizeProgression += DeltaSeconds;
+	}
 }
 
 
@@ -43,6 +52,8 @@ void APointAndClickAbility::ServerChargeAbility_Implementation(AActor * user, FV
 			chargeParticleSystem = UGameplayStatics::SpawnEmitterAtLocation(world, PS_AbilityCharge, spawnTransform, true);
 		}
 	}
+
+	psCurrentSizeProgression = 0;
 }
 
 // Called on clients to tell the server
