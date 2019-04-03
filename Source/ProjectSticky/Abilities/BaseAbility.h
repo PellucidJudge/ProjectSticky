@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+#include "ProjectSticky/Interfaces/HealthManipulation.h"
 #include "BaseAbility.generated.h"
 
 /**
@@ -37,20 +38,28 @@ public:
 	// Time taken for the ability to fully charge
 	UPROPERTY(EditAnywhere, Category = "Ability Stats")
 	float fullChargeTime = 0.5;
+	float currentChargeTime = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Ability Stats")
 	float baseRange = 100;
 
-	// Server side functions for 
-	UFUNCTION(Server, Reliable, WithValidation, Category = "Ability")
+	// Basic function
+	UFUNCTION(Category = "Ability")
 	virtual void ChargeAbility(AActor* user, FVector direction, FVector mouseLocation);
-	UFUNCTION(NetMulticast, Reliable, Category = "Ability")
-	virtual void ServerChargeAbility(AActor* user, FVector direction, FVector mouseLocation);
-
+	// Server functions
 	UFUNCTION(Server, Reliable, WithValidation, Category = "Ability")
-	virtual void ExecuteAbility(AActor* user, FVector direction, FVector mouseLocation);
+	virtual void Server_ChargeAbility(AActor* user, FVector direction, FVector mouseLocation);
 	UFUNCTION(NetMulticast, Reliable, Category = "Ability")
-	virtual void ServerExecuteAbility(AActor* user, FVector direction, FVector mouseLocation);
+	virtual void Multi_ChargeAbility(AActor* user, FVector direction, FVector mouseLocation);
+
+	// Basic function 
+	UFUNCTION(Category = "Ability")
+	virtual void ExecuteAbility(AActor* user, FVector direction, FVector mouseLocation);
+	// Server functions
+	UFUNCTION(Server, Reliable, WithValidation, Category = "Ability")
+	virtual void Server_ExecuteAbility(AActor* user, FVector direction, FVector mouseLocation);
+	UFUNCTION(NetMulticast, Reliable, Category = "Ability")
+	virtual void Multi_ExecuteAbility(AActor* user, FVector direction, FVector mouseLocation);
 	
 protected:
 
@@ -61,6 +70,9 @@ protected:
 	UFUNCTION()
 	UParticleSystemComponent* SpawnLastingParticleEffect(UParticleSystem* particleSystem, FTransform worldTransform);
 
+
+	UPROPERTY(EditAnywhere, Category = "Damage")
+	TArray<FDamageStruct> abilityDamage;
 
 	// Base damage for the ability
 	UPROPERTY(EditAnywhere, Category = "Ability Stats")
@@ -74,21 +86,37 @@ protected:
 	bool isCharging = false;
 	UPROPERTY()
 	AActor* currentUser;
+	UPROPERTY()
+	bool IsDebugActive = false;
 
 	// These are the base VFX systems most effects will make use of.
 	// What these systems are depends on ability, will be set in BP child classess
 	UPROPERTY(EditAnywhere, Category = "AbilityVFX")
 	UParticleSystem* PS_AbilityCharge;
 	UPROPERTY(EditAnywhere, Category = "AbilityVFX")
+	UParticleSystem* PS_AbilityChargeLoop;
+	UPROPERTY(EditAnywhere, Category = "AbilityVFX")
 	UParticleSystem* PS_AbilityExecutionPE;
 	UPROPERTY(EditAnywhere, Category = "AbilityVFX")
 	UParticleSystem* PS_AbilityHitPE;
+
+	UPROPERTY()
+	UParticleSystemComponent* chargeParticleSystem;
+	UPROPERTY()
+	UParticleSystemComponent* chargeParticleSystemLoop;
 
 	// Called when actually hitting another actor
 	UFUNCTION()
 	bool DamageActor(AActor* actor);
 
 	// Basic hit detection functions
-	//UFUNCTION()
-	//	bool MultiBoxTrace(FHitResult* Hit, )
+	UFUNCTION()
+	bool Damage_BoxTrace(FVector location, FVector boxDimensions, TArray<AActor*> actorsToIgnore);
+	UFUNCTION()
+	bool Damage_SphereTrace(FVector location, float radius, TArray<AActor*> actorsToIgnore);
+
+public:
+
+	UFUNCTION()
+	void SetCurrentUser(AActor* user);
 };

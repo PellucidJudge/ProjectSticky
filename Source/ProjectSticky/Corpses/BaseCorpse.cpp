@@ -21,6 +21,11 @@ void ABaseCorpse::BeginPlay()
 	
 }
 
+void ABaseCorpse::SetCharacter(ACharacter * deadChar)
+{
+	referenceToDeadChar = deadChar;
+}
+
 ACharacter* ABaseCorpse::ReviveCharacter()
 {
 	if (referenceToDeadChar != nullptr)

@@ -20,11 +20,11 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	virtual void ChargeAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
-	virtual void ServerChargeAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
+	virtual void Server_ChargeAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
+	virtual void Multi_ChargeAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 
-	virtual void ExecuteAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
-	virtual void ServerExecuteAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
+	virtual void Server_ExecuteAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
+	virtual void Multi_ExecuteAbility_Implementation(AActor* user, FVector direction, FVector mouseLocation) override;
 	
 protected:
 
@@ -32,8 +32,6 @@ protected:
 
 	UPROPERTY()
 	FVector startPos;
-	UPROPERTY()
-	UParticleSystemComponent* chargeParticleSystem;
 
 	UPROPERTY()
 	float psEndSize = 2;

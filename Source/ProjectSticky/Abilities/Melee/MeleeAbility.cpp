@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MeleeAbility.h"
-#include "ProjectSticky/Interfaces/HealthManipulation.h"
 #include "Engine.h"
 
 
@@ -28,12 +27,12 @@ void AMeleeAbility::Tick(float DeltaSeconds)
 	}
 }
 
-void AMeleeAbility::ChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
+void AMeleeAbility::Server_ChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
-	ServerChargeAbility(user, direction, mouseLocation);
+	Multi_ChargeAbility(user, direction, mouseLocation);
 }
 
-void AMeleeAbility::ServerChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
+void AMeleeAbility::Multi_ChargeAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 	isCharging = true;
 	currentUser = user;
@@ -57,14 +56,14 @@ void AMeleeAbility::ServerChargeAbility_Implementation(AActor * user, FVector di
 			{
 				PSC_ChargeParticles->SetWorldTransform(spawnTransform);
 				PSC_ChargeParticles->SetVisibility(true);
-				PSC_ChargeParticles->Activate();
+				PSC_ChargeParticles->Activate(true);
 			}
 		}
 	}
 }
 
 // Called on clients to tell the server
-void AMeleeAbility::ExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
+void AMeleeAbility::Server_ExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 	if (GEngine)
 	{
@@ -78,10 +77,10 @@ void AMeleeAbility::ExecuteAbility_Implementation(AActor * user, FVector directi
 		}
 	}
 
-    ServerExecuteAbility(user, direction, mouseLocation);
+    Multi_ExecuteAbility(user, direction, mouseLocation);
 }
 // Called on server to forward information and actually execute the ability 
-void AMeleeAbility::ServerExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
+void AMeleeAbility::Multi_ExecuteAbility_Implementation(AActor * user, FVector direction, FVector mouseLocation)
 {
 	isCharging = false;
 	direction = FVector(direction.X, direction.Y, 0);
@@ -117,7 +116,7 @@ void AMeleeAbility::ServerExecuteAbility_Implementation(AActor * user, FVector d
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, TEXT("PS_AbilityExecutionPE"));
 				FTransform spawnTransform;
-				spawnTransform.SetLocation(user->GetActorLocation());
+				spawnTransform.SetLocation(user->GetActorLocation() - FVector(0,0,100));
 				spawnTransform.SetRotation(direction.ToOrientationQuat());
 				spawnTransform.SetScale3D(FVector(1, 1, 1));
 

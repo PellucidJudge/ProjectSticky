@@ -19,8 +19,19 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(ABaseCharacter, healthMax);
+	DOREPLIFETIME(ABaseCharacter, healthCurrent);
+	DOREPLIFETIME(ABaseCharacter, armorCurrent);
+	
+	DOREPLIFETIME(ABaseCharacter, currentCharState);
 	DOREPLIFETIME(ABaseCharacter, movementSpeed);
 	DOREPLIFETIME(ABaseCharacter, movementSpeedMod);
+
+	DOREPLIFETIME(ABaseCharacter, basicAbility);
+	DOREPLIFETIME(ABaseCharacter, secondaryAbility);
+	DOREPLIFETIME(ABaseCharacter, slot1Ability);
+	DOREPLIFETIME(ABaseCharacter, slot2Ability);
+	DOREPLIFETIME(ABaseCharacter, slot3Ability);
 	//DOREPLIFETIME(ABaseCharacter, IsChargingAnAttack);
 }
 
@@ -30,55 +41,67 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*
-	if (GetMesh() != nullptr)
+	// Beginning Setup, only done on sever
+	if (Role == ROLE_Authority)
 	{
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		GetMesh()->SetAllBodiesSimulatePhysics(true);
-	}
-	*/
-	SetHealthCurrent(healthStart);
-
-	// Create ability instances
-	UWorld* world = GetWorld();
-	if (world != nullptr)
-	{
-		
-		UE_LOG(LogTemp, Warning, TEXT("beginplay"));
-		if (BasicAbilityClass != nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("create ability"));
-			basicAbility = world->SpawnActor<ABaseAbility>(BasicAbilityClass);
-			basicAbility->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			basicAbility->SetOwner(this);
-		}
-		if (SecondaryAbilityClass != nullptr)
-		{
-			secondaryAbility = world->SpawnActor<ABaseAbility>(SecondaryAbilityClass);
-			secondaryAbility->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			secondaryAbility->SetOwner(this);
-		}
-		if (Slot1AbilityClass != nullptr)
-		{
-			slot1Ability = world->SpawnActor<ABaseAbility>(Slot1AbilityClass);
-			slot1Ability->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			slot1Ability->SetOwner(this);
-		}
-		if (Slot2AbilityClass != nullptr)
-		{
-			slot2Ability = world->SpawnActor<ABaseAbility>(Slot2AbilityClass);
-			slot2Ability->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			slot2Ability->SetOwner(this);
-		}
-		if (Slot3AbilityClass != nullptr)
-		{
-			slot3Ability = world->SpawnActor<ABaseAbility>(Slot3AbilityClass);
-			slot3Ability->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			slot3Ability->SetOwner(this);
-		}
-		
+		SetHealthCurrent(healthStart);
 	}
 
+	InitAbilities();
+}
+
+void ABaseCharacter::InitAbilities_Implementation()
+{
+	if (Role == ROLE_Authority)
+	{
+		FActorSpawnParameters params;
+		if (GetController() != nullptr)
+		{
+			params.Owner = GetController();
+		}
+
+		// Create ability instances
+		UWorld* world = GetWorld();
+		if (world != nullptr)
+		{
+			if (BasicAbilityClass != nullptr)
+			{
+				basicAbility = world->SpawnActor<ABaseAbility>(BasicAbilityClass, params);
+				basicAbility->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				basicAbility->SetCurrentUser(this);
+			}
+			if (SecondaryAbilityClass != nullptr)
+			{
+				secondaryAbility = world->SpawnActor<ABaseAbility>(SecondaryAbilityClass, params);
+				secondaryAbility->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				secondaryAbility->SetCurrentUser(this);
+			}
+			if (Slot1AbilityClass != nullptr)
+			{
+				slot1Ability = world->SpawnActor<ABaseAbility>(Slot1AbilityClass, params);
+				slot1Ability->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				slot1Ability->SetCurrentUser(this);
+			}
+			if (Slot2AbilityClass != nullptr)
+			{
+				slot2Ability = world->SpawnActor<ABaseAbility>(Slot2AbilityClass, params);
+				slot2Ability->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				slot2Ability->SetCurrentUser(this);
+			}
+			if (Slot3AbilityClass != nullptr)
+			{
+				slot3Ability = world->SpawnActor<ABaseAbility>(Slot3AbilityClass, params);
+				slot3Ability->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				slot3Ability->SetCurrentUser(this);
+			}
+
+		}
+	}
+}
+
+bool ABaseCharacter::InitAbilities_Validate()
+{
+	return true;
 }
 
 // Called every frame
@@ -268,13 +291,14 @@ void ABaseCharacter::KnockBack_End()
 void ABaseCharacter::CharDeath()
 {
 	SetCharState(ECharState::CS_Dead);
-
+	
 	GetCharacterMovement()->GravityScale = 0;
 	if (GetMesh() != nullptr)
 	{
 		GetMesh()->SetVisibility(false);
 	}
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 }
 
 void ABaseCharacter::MoveCharacter(FVector moveDir)
@@ -425,7 +449,13 @@ void ABaseCharacter::SetCharState_Implementation(ECharState value) { currentChar
 bool ABaseCharacter::SetCharState_Validate(ECharState value) { return true; }
 
 float ABaseCharacter::GetHealthCurrent() { return healthCurrent; }
-void ABaseCharacter::SetHealthCurrent(float value){ healthCurrent = value; }
+void ABaseCharacter::SetHealthCurrent(float value)
+{ 
+	if (Role == ROLE_Authority)
+	{
+		healthCurrent = value;
+	}
+}
 
 float ABaseCharacter::GetHealthMax() { return healthMax; }
 void ABaseCharacter::SetHealthMax(float value) { healthMax = value; }

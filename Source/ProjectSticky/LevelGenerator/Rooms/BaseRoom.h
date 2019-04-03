@@ -15,7 +15,8 @@ enum class ETileType : uint8
 {
 	TT_Floor	UMETA(DisplayName = "Floor"),
 	TT_Wall		UMETA(DisplayName = "Wall"),
-	TT_Corner	UMETA(DisplayName = "Corner")
+	TT_Corner	UMETA(DisplayName = "Corner"),
+	TT_Gate		UMETA(DisplayName = "Gate")
 };
 
 USTRUCT()

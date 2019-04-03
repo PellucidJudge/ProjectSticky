@@ -18,6 +18,8 @@ public:
 	ABaseCorpse();
 
 	UFUNCTION()
+	void SetCharacter(ACharacter* deadChar);
+	UFUNCTION()
 	ACharacter* ReviveCharacter();
 
 protected:

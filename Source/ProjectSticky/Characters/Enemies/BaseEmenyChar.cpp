@@ -6,21 +6,27 @@
 void ABaseEmenyChar::CharDeath()
 {
 	Super::CharDeath();
-
+	
 	UE_LOG(LogTemp, Warning, TEXT("Enemy has died"));
-
+	
 	if (enemyCorpse != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No valid corpse"));
-		UWorld* world = GetWorld();
-		if (world)
+		ABaseCorpse* corpse = Cast<ABaseCorpse>(enemyCorpse);
+		if (corpse != nullptr)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("A Corpse was spawned"));
+			corpse->SetCharacter(this);
 
-			FVector location = this->GetActorLocation();
-			FRotator rotation = this->GetActorRotation();
-			FActorSpawnParameters SPawnInfo;
-			world->SpawnActor<ABaseCorpse>(enemyCorpse, location, rotation, SPawnInfo);
+			UE_LOG(LogTemp, Warning, TEXT("No valid corpse"));
+			UWorld* world = GetWorld();
+			if (world)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("A Corpse was spawned"));
+
+				FVector location = this->GetActorLocation();
+				FRotator rotation = this->GetActorRotation();
+				FActorSpawnParameters SPawnInfo;
+				world->SpawnActor<ABaseCorpse>(enemyCorpse, location, rotation, SPawnInfo);
+			}
 		}
 	}
 }

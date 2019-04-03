@@ -49,21 +49,21 @@ protected:
 	bool rotateToFaceMoveDirection = false;
 
 	// Character stats
-	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
+	UPROPERTY(Replicated, EditAnywhere, Category = "Stats|Defense")
 	float healthMax = 3;
 	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
 	float healthStart = 3;
-	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
+	UPROPERTY(Replicated, EditAnywhere, Category = "Stats|Defense")
 	float healthCurrent = 3;
 	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
 	float armorStart = 0;
-	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
+	UPROPERTY(Replicated, EditAnywhere, Category = "Stats|Defense")
 	float armorCurrent = 0;
 	UPROPERTY(EditAnywhere, Category = "Stats|Defense")
 	FDefenceWeaknessStruct defenceAndWeaknesess;
 	UPROPERTY(EditAnywhere, Category = "Stats|Combat")
 	float CharDamage;
-	UPROPERTY(EditAnywhere, Category = "Stats|Combat")
+	UPROPERTY(Replicated, EditAnywhere, Category = "Stats|Combat")
 	ECharState currentCharState = ECharState::CS_Idle;
 
 	UPROPERTY(replicated, EditAnywhere, Category = "Stats|Utility")
@@ -86,15 +86,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TSubclassOf<class ABaseAbility> Slot3AbilityClass;
 
-	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	UPROPERTY(Replicated, VisibleAnywhere, Category = "Abilities")
 	ABaseAbility* basicAbility;
-	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	UPROPERTY(Replicated, VisibleAnywhere, Category = "Abilities")
 	ABaseAbility* secondaryAbility;
-	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	UPROPERTY(Replicated, VisibleAnywhere, Category = "Abilities")
 	ABaseAbility* slot1Ability;
-	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	UPROPERTY(Replicated, VisibleAnywhere, Category = "Abilities")
 	ABaseAbility* slot2Ability;
-	UPROPERTY(VisibleAnywhere, Category = "Abilities")
+	UPROPERTY(Replicated, VisibleAnywhere, Category = "Abilities")
 	ABaseAbility* slot3Ability;
 
 	UPROPERTY(VisibleAnywhere, Category = "Knockback")
@@ -114,6 +114,11 @@ protected:
 	void KnockBack_Update(float deltaSeconds);
 	UFUNCTION()
 	void KnockBack_End();
+
+	//UFUNCTION(Server, Reliable, WithValidation, Category = "Abilities")
+	//void InitCharacter();
+	UFUNCTION(Server, Reliable, WithValidation, Category = "Abilities")
+	void InitAbilities();
 
 public:	
 
